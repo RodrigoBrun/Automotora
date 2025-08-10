@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Automotora – Catálogo de Vehículos</title>
+
+  <!-- =========================================================
+       📦 Dependencias externas
+       - AOS: animaciones on scroll
+       - Phosphor Icons: íconos livianos
+  ========================================================== -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"/>
+
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- =========================================================
+       🔝 Header fijo + Navbar (desktop)
+       Qué: navegación principal, toggle de tema, hamburguesa mobile
+       Por qué: acceso rápido a secciones y control de modo claro/oscuro
+       Dependencias: .nav-links, #btn-modo-oscuro, #hamburguesa (script.js)
+  ========================================================== -->
+  <header class="header">
+    <div class="container header-content">
+      <a href="#" class="logo" aria-label="Ir al inicio">
+        <span class="logo-marca">Automotora</span>
+        <span class="logo-tag">Crador Rodrigo Brun</span>
+      </a>
+
+      <nav class="nav" aria-label="Navegación principal">
+        <ul class="nav-links">
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#vehiculos">Vehículos</a></li>
+          <li><a href="#sobre">Sobre Nosotros</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+
+        <button id="btn-modo-oscuro" class="btn-modo" aria-label="Cambiar tema">
+          <i class="ph ph-moon" aria-hidden="true"></i>
+        </button>
+
+        <button id="hamburguesa" class="btn-hamburguesa" aria-label="Abrir menú">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       📋 Sidebar (mobile)
+       Qué: menú lateral para móviles
+       Por qué: UX limpia en pantallas chicas (SPA mobile)
+       Dependencias: #sidebar.active (styles), wire en script.js
+  ========================================================== -->
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <nav class="sidebar-nav" aria-label="Navegación móvil">
+      <a href="#inicio"><i class="ph ph-house"></i> Inicio</a>
+      <a href="#vehiculos"><i class="ph ph-car"></i> Vehículos</a>
+      <a href="#sobre"><i class="ph ph-info"></i> Sobre Nosotros</a>
+      <a href="#contacto"><i class="ph ph-phone"></i> Contacto</a>
+    </nav>
+  </aside>
+
+  <!-- =========================================================
+       🧱 MAIN – Secciones
+       Nota: usar class="seccion" para que funcione la SPA mobile
+  ========================================================== -->
+  <main class="main container">
+
+    <!-- ================================
+         🎯 INICIO (hero)
+         Qué: mensaje principal y CTA a vehículos
+         Dependencias: AOS para animación
+    ================================ -->
+    <section id="inicio" class="seccion seccion-inicio" data-aos="fade-up">
+      <div class="hero">
+        <h1>Encontrá tu próximo vehículo</h1>
+        <p>Catálogo actualizado, filtros por marca, tipo y más. Todo en un solo lugar.</p>
+        <a href="#vehiculos" class="btn-primario">Ver Vehículos</a>
+      </div>
+    </section>
+
+    <!-- ================================
+         🚗 VEHÍCULOS (Galería principal)
+         Qué: filtros avanzados + galería + ordenar
+         Por qué: búsqueda rápida y UX pro
+         Dependencias: #galeriaAutos (render en script.js)
+    ================================ -->
+    <section id="vehiculos" class="seccion" data-aos="fade-up">
+      <!-- ================================
+           🔎 Filtros (UI)
+           - Search (marca/modelo)
+           - Marca, Tipo, Km máx, Año mín
+           - Ordenar por
+      ================================ -->
+      <div class="filtros">
+        <!-- 🔤 Búsqueda por texto -->
+        <div class="filtro filtro-busqueda">
+          <label for="filtroSearch">Buscar</label>
+          <input id="filtroSearch" type="text" placeholder="Marca o modelo…"
+                 aria-label="Buscar por marca o modelo">
+        </div>
+
+        <!-- 🏷️ Marca -->
+        <div class="filtro">
+          <label for="filtroMarca">Marca</label>
+          <select id="filtroMarca" aria-label="Filtrar por marca">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <!-- 🚘 Tipo -->
+        <div class="filtro">
+          <label for="filtroTipo">Tipo</label>
+          <select id="filtroTipo" aria-label="Filtrar por tipo de vehículo">
+            <option value="">Todos</option>
+            <option value="Auto">Auto</option>
+            <option value="Camioneta">Camioneta</option>
+            <option value="SUV">SUV</option>
+          </select>
+        </div>
+
+        <!-- ⏱ Km máx -->
+        <div class="filtro">
+          <label for="filtroKm">Km (máx.)</label>
+          <select id="filtroKm" aria-label="Filtrar por kilometraje máximo">
+            <option value="">Sin límite</option>
+            <option value="50000">50.000</option>
+            <option value="100000">100.000</option>
+            <option value="150000">150.000</option>
+          </select>
+        </div>
+
+        <!-- 📅 Año mín -->
+        <div class="filtro">
+          <label for="filtroAnio">Año (mín.)</label>
+          <select id="filtroAnio" aria-label="Filtrar por año mínimo">
+            <option value="">Todos</option>
+            <option value="2015">2015</option>
+            <option value="2018">2018</option>
+            <option value="2020">2020</option>
+            <option value="2022">2022</option>
+          </select>
+        </div>
+
+        <!-- ↕️ Orden -->
+        <div class="filtro filtro-orden">
+          <label for="ordenSelect">Ordenar por</label>
+          <select id="ordenSelect" aria-label="Ordenar resultados">
+            <option value="relevancia">Relevancia</option>
+            <option value="precio-asc">Precio ↑</option>
+            <option value="precio-desc">Precio ↓</option>
+            <option value="anio-desc">Año ↓</option>
+            <option value="anio-asc">Año ↑</option>
+            <option value="km-asc">Km ↑</option>
+            <option value="km-desc">Km ↓</option>
+          </select>
+        </div>
+
+        <button id="btnLimpiarFiltros" class="btn-secundario" aria-label="Limpiar filtros">Limpiar</button>
+      </div>
+
+      <!-- ================================
+           🖼️ Galería de autos
+           Render dinámico desde script.js
+      ================================ -->
+      <div id="galeriaAutos" class="galeria-autos" aria-live="polite"></div>
+    </section>
+
+   <!-- ================================
+     🧾 SOBRE NOSOTROS
+     Qué: propuesta de valor, pruebas sociales y CTA
+     Por qué: transmitir confianza y guiar a la acción
+================================ -->
+<section id="sobre" class="seccion" data-aos="fade-up">
+  <header class="seccion-head" style="display:grid;gap:.5rem">
+    <h2>Sobre Nosotros</h2>
+    <p>
+      Somos una automotora enfocada en <strong>transparencia</strong> y <strong>servicio</strong>.
+      Publicamos precios reales, describimos el estado de cada unidad y brindamos atención
+      personalizada en nuestro local o por teléfono. Horario de atención: <b>09:00–12:00</b> y <b>14:00–19:00</b>.
+    </p>
+  </header>
+
+  <!-- ⭐️ Puntos fuertes (bullets cortos) -->
+  <ul class="destacados" style="display:grid;gap:.6rem;margin:1rem 0 1.25rem;padding-left:0;list-style:none">
+    <li style="display:flex;align-items:center;gap:.6rem">
+      <i class="ph ph-seal-check" aria-hidden="true"></i>
+      <span>Vehículos inspeccionados y con historial claro</span>
+    </li>
+    <li style="display:flex;align-items:center;gap:.6rem">
+      <i class="ph ph-arrows-left-right" aria-hidden="true"></i>
+      <span>Tomamos tu usado en parte de pago</span>
+    </li>
+    <li style="display:flex;align-items:center;gap:.6rem">
+      <i class="ph ph-identification-card" aria-hidden="true"></i>
+      <span>Gestión de papeles y asesoramiento</span>
+    </li>
+  </ul>
+
+  <!-- 🧭 Mini flujo: cómo trabajamos -->
+  <ol class="proceso" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 1rem 0;padding-left:1.1rem">
+    <li>
+      <strong>Elegí</strong><br>
+      Navegá el catálogo, filtrá por marca, tipo y año.
+    </li>
+    <li>
+      <strong>Coordinamos</strong><br>
+      Agenda visita, prueba de manejo y revisión mecánica.
+    </li>
+    <li>
+      <strong>Te lo llevás</strong><br>
+      Armamos la documentación y te entregamos la unidad.
+    </li>
+  </ol>
+
+  <!-- 🎯 CTA doble -->
+  <div class="cta-strip" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem">
+    <a href="#vehiculos" class="btn-primario">Ver Vehículos</a>
+    <a href="#contacto" class="btn-secundario">Contactar</a>
+  </div>
+</section>
+
+
+    <!-- ================================
+         📞 CONTACTO
+         Qué: formulario + disponibilidad horaria
+         Por qué: convertir interesados en consultas
+         Dependencias: indicador actualizado en script.js
+    ================================ -->
+    <section id="contacto" class="seccion" data-aos="fade-up">
+      <h2>Contacto</h2>
+
+      <!-- ⏱ Estado de disponibilidad -->
+      <div class="bloque-disponibilidad" role="status" aria-live="polite">
+        <span class="indicador" id="indicadorDisponibilidad" aria-hidden="true"></span>
+        <span id="disponibilidadEstado">Disponibilidad: calculando…</span>
+        <span class="horario">Horario: 09:00–12:00 y 14:00–19:00</span>
+      </div>
+
+      <!-- 📨 Formulario -->
+      <form id="formContacto" class="form">
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" placeholder="Tu nombre" required>
+        </div>
+        <div class="campo">
+          <label for="telefono">WhatsApp</label>
+          <input id="telefono" type="tel" placeholder="+598 9..." required>
+        </div>
+        <div class="campo">
+          <label for="mensaje">Mensaje</label>
+          <textarea id="mensaje" rows="4" placeholder="¿Qué vehículo te interesa?" required></textarea>
+        </div>
+        <button type="submit" class="btn-primario">Enviar</button>
+      </form>
+      <!-- TODO: Integrar EmailJS / backend en iteración posterior -->
+    </section>
+  </main>
+
+  <!-- =========================================================
+       🦶 Footer
+  ========================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="anio"></span> Automotora. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       🪟 Modal Detalle de Vehículo
+       Qué: muestra fotos, datos y CTA a contacto
+       Por qué: enriquecer ficha sin salir de la galería
+       Dependencias: #modal, [data-close-modal] (script.js gestiona abrir/cerrar)
+  ========================================================== -->
+  <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" aria-label="Cerrar" data-close-modal>
+        <i class="ph ph-x"></i>
+      </button>
+      <div id="modalBody"><!-- render dinámico de la ficha --></div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       🔌 Scripts
+       - AOS: lib externa
+       - script.js: lógica de Sistema + UI + SPA/tema/modal
+  ========================================================== -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
