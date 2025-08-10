@@ -359,7 +359,7 @@ function uiActualizarListado(){
  */
 function uiAbrirModalVehiculo(v){
   const modal = document.getElementById("modal");
-  const body = document.getElementById("modalBody");
+  const body  = document.getElementById("modalBody");
   if (!modal || !body) return;
 
   body.innerHTML = "";
@@ -367,12 +367,15 @@ function uiAbrirModalVehiculo(v){
   // Header (título + badge)
   const header = document.createElement("div");
   header.className = "modal-header";
+
   const h3 = document.createElement("h3");
   h3.textContent = `${v.marca} ${v.modelo}`;
+
   const badge = document.createElement("span");
-  badge.className = "badge"; 
+  badge.className = "badge";
   badge.textContent = v.tipo;
-  header.appendChild(h3); 
+
+  header.appendChild(h3);
   header.appendChild(badge);
 
   // Galería (principal + secundarias)
@@ -380,11 +383,17 @@ function uiAbrirModalVehiculo(v){
   galeria.className = "modal-galeria";
 
   const contPrincipal = document.createElement("div");
-  contPrincipal.appendChild(crearImagenSegura(v.imagen, `${v.marca} ${v.modelo}`));
+  contPrincipal.appendChild(
+    crearImagenSegura(v.imagen, `${v.marca} ${v.modelo}`)
+  );
 
   const contSec = document.createElement("div");
   if (Array.isArray(v.fotos) && v.fotos.length) {
-    v.fotos.forEach(src => contSec.appendChild(crearImagenSegura(src, `${v.marca} ${v.modelo} foto adicional`)));
+    v.fotos.forEach(src=>{
+      contSec.appendChild(
+        crearImagenSegura(src, `${v.marca} ${v.modelo} foto adicional`)
+      );
+    });
   }
 
   galeria.appendChild(contPrincipal);
@@ -410,17 +419,19 @@ function uiAbrirModalVehiculo(v){
   desc.textContent = v.descripcion || "Sin descripción adicional.";
 
   const ctas = document.createElement("div");
-  // 🔁 REEMPLAZO del <a> por botón que dispara la acción completa
+  ctas.className = "modal-cta";                   // ⬅️ hace sticky el CTA al fondo
+
+  // Botón que dispara la acción completa de contacto
   const btnContactar = document.createElement("button");
   btnContactar.type = "button";
   btnContactar.className = "btn-primario";
   btnContactar.textContent = "Contactar";
-  btnContactar.addEventListener("click", () => uiContactarVehiculo(v));
+  btnContactar.addEventListener("click", ()=> uiContactarVehiculo(v));
   ctas.appendChild(btnContactar);
 
-  datos.appendChild(specs); 
-  datos.appendChild(precio); 
-  datos.appendChild(desc); 
+  datos.appendChild(specs);
+  datos.appendChild(precio);
+  datos.appendChild(desc);
   datos.appendChild(ctas);
 
   body.appendChild(header);
@@ -430,6 +441,42 @@ function uiAbrirModalVehiculo(v){
   modal.classList.add("abierto");
   modal.setAttribute("aria-hidden","false");
 }
+
+/**
+ * Cierra el modal, navega a #contacto y pre-llena el mensaje.
+ * @param {Vehiculo} v
+ */
+function uiContactarVehiculo(v){
+  // 1) Cerrar modal
+  if (typeof uiCerrarModal === "function") uiCerrarModal();
+  else {
+    const m = document.getElementById("modal");
+    if (m){ m.classList.remove("abierto"); m.setAttribute("aria-hidden","true"); }
+  }
+
+  // 2) Ir a la sección contacto (SPA mobile o scroll normal)
+  const sec = document.querySelector("#contacto");
+  if (sec){
+    if (document.body.classList.contains("spa-mobile")){
+      document.querySelectorAll(".seccion").forEach(el=>el.classList.remove("activa"));
+      sec.classList.add("activa");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  } else {
+    location.hash = "#contacto";
+  }
+
+  // 3) Pre-llenar mensaje
+  const mensaje = document.querySelector('#contacto textarea[name="mensaje"], #contacto textarea#mensaje, #contacto textarea');
+  const nombre  = document.querySelector('#contacto input[name="nombre"], #contacto input#nombre, #contacto input[type="text"]');
+
+  const texto = `Hola, me interesa este vehículo: ${v.marca} ${v.modelo} (${v.anio}, ${v.km.toLocaleString()} km) - USD ${v.precio.toLocaleString()}.`;
+  if (mensaje) mensaje.value = texto;
+  if (nombre)  nombre.focus();
+}
+
 
 /* ---------------------------------------------------------
    CTA “Contactar” del modal → cierra, navega y pre-rellena
