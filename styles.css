@@ -596,3 +596,127 @@ body.modo-oscuro .badge { background: rgba(34,197,94,.15); color: #15803d; borde
 ================================ */
 body.spa-mobile .seccion { display: none; }
 body.spa-mobile .seccion.activa { display: block; }
+
+
+/* ================================
+   📱 Fixes Mobile  (añadir al final)
+================================ */
+
+/* --- CONTACTO: Disponibilidad/Horario como pills --- */
+#contacto .bloque-disponibilidad {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0;               /* el padding lo llevan las cajas */
+}
+
+/* oculto el punto suelto y lo genero como pseudo del texto */
+#contacto .bloque-disponibilidad .indicador { display: none; }
+
+#contacto #disponibilidadEstado,
+#contacto .horario {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.06));
+}
+
+#contacto #disponibilidadEstado::before{
+  content:"";
+  width: 12px; height: 12px; border-radius: 999px;
+  background: #bbb;               /* default */
+  box-shadow: 0 0 0 0 rgba(34,197,94,0);
+}
+
+/* el JS setea .abierto / .cerrado en #disponibilidadEstado */
+#contacto #disponibilidadEstado.abierto::before{
+  background: #22c55e;
+  animation: pulse-estado 1.8s ease-out infinite;
+}
+#contacto #disponibilidadEstado.cerrado::before{ background: #ef4444; }
+
+@media (max-width: 480px){
+  #contacto .bloque-disponibilidad{ grid-template-columns: 1fr; }
+}
+
+/* --- SOBRE NOSOTROS: proceso 1-2-3 en mobile apilado --- */
+#sobre .proceso{ display:grid; gap:12px; grid-template-columns: repeat(3,1fr); }
+#sobre .proceso .paso{ min-width:0; }
+@media (max-width: 768px){
+  #sobre .proceso{ grid-template-columns: 1fr; }
+}
+
+/* --- Galería: estado vacío ocupa todo el ancho --- */
+.galeria-autos > p{
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 18px;
+  border: 1px dashed var(--color-borde);
+  border-radius: 12px;
+  color: var(--color-texto-sec);
+}
+
+/* --- Hamburguesa: líneas más claras y centradas --- */
+.btn-hamburguesa{ width:44px; height:44px; }
+.btn-hamburguesa span{ width:22px; margin:4px 0; }
+
+/* --- MODAL: que entre en pantalla, header fijo, CTA sticky --- */
+.modal-content{
+  max-height: 92dvh;                /* respeta barra iOS */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;                 /* el scroll va en el body */
+  padding-bottom: 0;                /* el CTA tiene su padding */
+}
+
+/* el contenedor donde metés header+galería+datos */
+#modalBody{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px;
+  padding-bottom: 12px;             /* deja lugar al CTA sticky */
+}
+
+/* título siempre visible al scrollear */
+/* Modal header — limpio, sin overlay */
+.modal-header{
+  position: relative;
+  background: transparent;
+  margin: 0 0 12px 0;      /* separa del contenido, no lo pisa */
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-header h3{
+  margin: 0;
+  font-size: 1.35rem;      /* ajustá si querés más chico en mobile */
+  line-height: 1.2;
+}
+
+.modal-header .badge{
+  margin-left: auto;       /* manda el chip a la derecha */
+  white-space: nowrap;
+}
+
+
+/* imágenes adaptativas en mobile */
+.modal-galeria img{
+  height: clamp(200px, 36dvh, 340px);
+}
+
+/* CTA pegado abajo y siempre visible */
+.modal-cta{
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background:
+    linear-gradient(to top, var(--color-panel) 70%, color-mix(in srgb, var(--color-panel), transparent 70%));
+  padding: 12px 18px;
+  border-top: 1px solid var(--color-borde);
+}
+.modal-cta .btn-primario{ width: 100%; }
