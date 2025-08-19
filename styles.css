@@ -865,3 +865,118 @@ body.modo-oscuro #sidebar .sidebar-nav > a{
 /* Más compacto aún (si lo quisieras): */
 #sidebar .sidebar-nav{ gap: 4px !important; }
 #sidebar .sidebar-nav > a{ height: 40px !important; min-height: 40px !important; }
+
+
+/* ===== Modal: layout responsive y scroll interno ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;                     /* se activa con .abierto */
+  align-items: flex-start;           /* que arranque arriba */
+  justify-content: center;
+  padding: clamp(8px, 2vw, 24px);
+  background: rgba(0,0,0,.5);
+  z-index: 1000;
+}
+.modal.abierto { display: flex; }
+
+.modal .modal-content {
+  width: min(920px, 100%);
+  max-height: calc(100svh - 16px);   /* svh = viewport real en mobile */
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;                  /* recorta bordes en scroll */
+  background: var(--color-fondo);
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+}
+
+/* Header fijo arriba dentro del modal */
+.modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 16px 20px;
+  background: var(--color-fondo);
+  border-bottom: 1px solid var(--color-borde, rgba(255,255,255,.08));
+}
+
+/* Área scrolleable (todo el medio) */
+#modalBody {
+  overflow: auto;
+  padding: 16px 20px 0 20px;
+}
+
+/* CTA fijo abajo del modal */
+.modal-cta {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 12px 20px;
+  background: var(--color-fondo);
+  border-top: 1px solid var(--color-borde, rgba(255,255,255,.08));
+}
+
+/* Galería dentro del modal */
+.modal-galeria > div:first-child img { /* imagen principal */
+  width: 100%;
+  height: auto;
+  max-height: 52svh;                  /* no pasar media pantalla */
+  object-fit: cover;
+  border-radius: 12px;
+}
+.modal-galeria > div:last-child {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+.modal-galeria img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* Evitar scroll del fondo cuando el modal está abierto */
+body.no-scroll { overflow: hidden; }
+
+
+/* ===== Modal – Galería con fotos GRANDES ===== */
+.modal-galeria {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Imagen principal grande */
+.modal-galeria .principal img {
+  width: 100%;
+  height: auto;
+  max-height: 62svh;            /* bien alta en mobile */
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+/* Secundarias: también grandes (una por fila en mobile) */
+.modal-galeria .secundarias {
+  display: grid;
+  grid-template-columns: 1fr;   /* 1 por fila en mobile */
+  gap: 14px;
+}
+.modal-galeria .secundarias img {
+  width: 100%;
+  height: auto;
+  max-height: 56svh;            /* grandes pero un poco menos que la principal */
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+/* En pantallas medias/desktop, dos columnas para secundarias */
+@media (min-width: 768px) {
+  .modal-galeria .principal img {
+    max-height: 68vh;
+  }
+  .modal-galeria .secundarias {
+    grid-template-columns: 1fr 1fr; /* dos grandes lado a lado */
+  }
+}
