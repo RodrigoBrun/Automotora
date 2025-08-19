@@ -34,10 +34,7 @@ body {
   transition: background-color .25s ease, color .25s ease, background .25s ease;
 }
 
-.container {
-  width: min(1200px, 92%);
-  margin: 0 auto;
-}
+.container { width: min(1200px, 92%); margin: 0 auto; }
 
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
@@ -46,33 +43,19 @@ img { max-width: 100%; display: block; }
    🔝 Header fijo
 ================================ */
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  position: sticky; top: 0; z-index: 50;
   background: rgba(15,17,21,.7);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--color-borde);
   transition: background-color .25s ease, border-color .25s ease;
 }
-
-.header-content {
-  height: var(--alto-header);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
+.header-content { height: var(--alto-header); display: flex; align-items: center; justify-content: space-between; }
 .logo { display: flex; flex-direction: column; line-height: 1; }
 .logo-marca { font-weight: 800; letter-spacing: .5px; }
 .logo-tag { font-size: .8rem; color: var(--color-texto-sec); }
-
 .nav { display: flex; align-items: center; gap: 16px; }
-.nav-links {
-  list-style: none; display: flex; gap: 18px; margin: 0; padding: 0;
-}
-.nav-links a {
-  padding: 8px 12px; border-radius: 10px; transition: background .2s ease;
-}
+.nav-links { list-style: none; display: flex; gap: 18px; margin: 0; padding: 0; }
+.nav-links a { padding: 8px 12px; border-radius: 10px; transition: background .2s ease; }
 .nav-links a:hover { background: rgba(255,255,255,.06); }
 
 .btn-modo {
@@ -85,47 +68,109 @@ img { max-width: 100%; display: block; }
   cursor: pointer;
   transition: background-color .25s ease, color .25s ease, border-color .25s ease;
 }
+.btn-modo i { font-size: 20px; line-height: 1; }
 
+/* ================================
+   🍔 Botón hamburguesa
+================================ */
 .btn-hamburguesa {
-  display: none;
-  width: 40px; height: 40px;
+  display: none;                 /* visible en mobile (ver @media) */
+  width: 44px; height: 44px;
   border: 1px solid var(--color-borde);
   background: var(--color-panel);
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   align-items: center; justify-content: center;
+  flex-direction: column;
   transition: background-color .25s ease, border-color .25s ease;
 }
 .btn-hamburguesa span {
-  display: block; width: 20px; height: 2px; background: var(--color-texto);
-  margin: 3px 0; border-radius: 2px;
-  transition: background-color .25s ease;
+  display: block; width: 22px; height: 2px;
+  background: var(--color-texto);
+  margin: 4px 0; border-radius: 2px;
+  transition: background-color .25s ease, transform .25s ease, opacity .2s ease;
 }
+.btn-hamburguesa.abierto span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+.btn-hamburguesa.abierto span:nth-child(2){ opacity: 0; }
+.btn-hamburguesa.abierto span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
 
 /* ================================
-   📋 Sidebar (mobile)
+   📋 Sidebar (mobile) — overlay + sheet compacto
 ================================ */
-.sidebar {
-  position: fixed; inset: 0 0 0 auto;
-  width: 260px; background: #0b0e13; border-left: 1px solid var(--color-borde);
+.sidebar{
+  position: fixed; inset: 0;
+  z-index: 60;
+  opacity: 0; pointer-events: none;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(2px);
+  transition: opacity .25s ease;
+}
+.sidebar.active{ opacity: 1; pointer-events: auto; }
+
+/* Panel deslizante */
+.sidebar .sidebar-sheet{
+  position: absolute; right: 0; top: 0; bottom: 0;
+  width: min(320px, 86vw);
+  background: var(--color-panel);
+  border-left: 1px solid var(--color-borde);
   transform: translateX(100%);
-  transition: transform .25s ease, background-color .25s ease, border-color .25s ease;
-  z-index: 60; padding-top: var(--alto-header);
+  transition: transform .28s ease;
+  display: grid; grid-template-rows: auto 1fr;
 }
-.sidebar.active { transform: translateX(0); }
-.sidebar-nav { display: grid; gap: 6px; padding: 14px; }
-.sidebar-nav a {
-  padding: 12px 14px; border-radius: 12px; display: flex; gap: 10px; align-items: center;
-  border: 1px solid var(--color-borde); background: #0f1218;
-  transition: background-color .25s ease, border-color .25s ease;
+.sidebar.active .sidebar-sheet{ transform: translateX(0); }
+
+/* Cabecera */
+.sidebar-head{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 10px 14px;
+  border-bottom: 1px solid var(--color-borde);
 }
-.sidebar-nav a:hover { background: #121620; }
+.sidebar-head .brand-mini{ font-weight: 800; }
+.btn-icon{
+  width: 36px; height: 36px; display: grid; place-items: center;
+  border: 1px solid var(--color-borde);
+  background: var(--color-panel);
+  border-radius: 10px; cursor: pointer;
+}
+
+/* Navegación compacta */
+.sidebar-nav{
+  display: grid; gap: 8px;
+  padding: 12px; list-style: none; margin: 0;
+}
+.sidebar-nav a{
+  display: grid;
+  grid-template-columns: 24px 1fr 16px; /* icono | texto | chevron */
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: .95rem;
+  border: 1px solid var(--color-borde);
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.06));
+  transition: transform .12s ease, background-color .25s ease, border-color .25s ease;
+}
+.sidebar-nav a:hover{ transform: translateX(-2px); }
+.sidebar-nav a .ico, .sidebar-nav a .chev{ display: grid; place-items: center; line-height: 0; color: var(--color-texto-sec); }
+.sidebar-nav a .ico svg{ width: 18px; height: 18px; }
+.sidebar-nav a .chev{ justify-self: end; opacity: .6; }
+.sidebar-nav a .chev svg{ width: 12px; height: 12px; }
+
+/* Overlay: cuando abre, evitamos scroll del fondo */
+body.no-scroll{ overflow: hidden; }
+body.menu-abierto::before{ content:""; position: fixed; inset: 0; }
+
+/* Modo claro de la sidebar */
+body.modo-oscuro .sidebar{ background: rgba(15,17,21,.35); }
+body.modo-oscuro .btn-icon{ background: #fff; }
+body.modo-oscuro .sidebar .sidebar-sheet{ background: #fff; border-color: #e5e7eb; }
+body.modo-oscuro .sidebar-nav a{ background: #fff; border-color: #e5e7eb; }
 
 /* ================================
    🧱 Secciones
 ================================ */
 .main { padding-top: 32px; }
-
 .seccion {
   margin: 28px 0; padding: 24px;
   background: var(--color-panel);
@@ -134,7 +179,6 @@ img { max-width: 100%; display: block; }
   box-shadow: var(--sombras);
   transition: background-color .25s ease, border-color .25s ease, color .25s ease;
 }
-
 .seccion h2 { margin: 0 0 16px; }
 
 .seccion-inicio .hero {
@@ -143,9 +187,7 @@ img { max-width: 100%; display: block; }
   border-radius: var(--radius);
   border: 1px solid var(--color-borde);
 }
-.btn-primario, .btn-secundario {
-  border: none; cursor: pointer; padding: 12px 16px; border-radius: 12px; font-weight: 700;
-}
+.btn-primario, .btn-secundario { border: none; cursor: pointer; padding: 12px 16px; border-radius: 12px; font-weight: 700; }
 .btn-primario { background: var(--color-principal); color: #0a0f14; }
 .btn-primario:hover { filter: brightness(1.05); }
 .btn-secundario { background: #202635; color: var(--color-texto); border: 1px solid var(--color-borde); }
@@ -169,28 +211,20 @@ img { max-width: 100%; display: block; }
 }
 .filtro-busqueda { grid-column: span 2; }
 .filtro-orden { grid-column: span 1; }
+.filtro-orden select{ min-width: 220px; }
 
 /* ================================
    🖼️ Galería
 ================================ */
-.galeria-autos {
-  display: grid; gap: 16px;
-  grid-template-columns: repeat(12, 1fr);
-}
+.galeria-autos { display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); }
 .card-auto {
-  grid-column: span 4;
-  position: relative; overflow: hidden; border-radius: 16px;
+  grid-column: span 4; position: relative; overflow: hidden; border-radius: 16px;
   background: #0f1218; border: 1px solid var(--color-borde);
   transition: transform .22s ease, box-shadow .22s ease, background-color .25s ease, border-color .25s ease;
 }
 .card-auto:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,.35); }
-.card-auto img {
-  width: 100%; height: 220px; object-fit: cover;
-  filter: saturate(1.05) contrast(1.05);
-}
-.card-body {
-  padding: 12px 14px; display: grid; gap: 6px;
-}
+.card-auto img { width: 100%; height: 220px; object-fit: cover; filter: saturate(1.05) contrast(1.05); }
+.card-body { padding: 12px 14px; display: grid; gap: 6px; }
 .card-titulo { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
 .card-titulo h3 { margin: 0; font-size: 1.05rem; }
 .badge {
@@ -200,26 +234,14 @@ img { max-width: 100%; display: block; }
 .card-meta { font-size: .9rem; color: var(--color-texto-sec); display: flex; gap: 10px; flex-wrap: wrap; }
 .card-precio { font-weight: 800; }
 .card-acciones { display: flex; gap: 8px; margin-top: 4px; }
-.btn-info {
-  background: var(--color-secundario);
-  color: #0b1020;
-  padding: 8px 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
+.btn-info { background: var(--color-secundario); color: #0b1020; padding: 8px 10px; border: none; border-radius: 8px; cursor: pointer; }
 .btn-info:hover { filter: brightness(1.05); }
 
 /* ================================
    📞 Disponibilidad
 ================================ */
-.bloque-disponibilidad {
-  display: flex; gap: 10px; align-items: center; margin-bottom: 16px;
-}
-.bloque-disponibilidad .indicador {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: #bbb;
-}
+.bloque-disponibilidad { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
+.bloque-disponibilidad .indicador { width: 10px; height: 10px; border-radius: 50%; background: #bbb; }
 .estado-abierto { background: #22c55e !important; }
 .estado-cerrado { background: #ef4444 !important; }
 .horario { color: var(--color-texto-sec); }
@@ -230,324 +252,126 @@ img { max-width: 100%; display: block; }
 .modal { position: fixed; inset: 0; display: none; z-index: 80; }
 .modal.abierto { display: block; }
 .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.5); }
-
 .modal-content {
-  position: relative;           /* Necesario para posicionar la X */
-  z-index: 1;
-  width: min(960px, 92%);
-  margin: 6vh auto;
-  background: var(--color-panel);
-  border: 1px solid var(--color-borde);
-  border-radius: 16px;
-  box-shadow: var(--sombras);
-  padding: 18px;
+  position: relative; z-index: 1; width: min(960px, 92%); margin: 6vh auto;
+  background: var(--color-panel); border: 1px solid var(--color-borde);
+  border-radius: 16px; box-shadow: var(--sombras); padding: 18px;
 }
-
-/* Botón cerrar: por encima y con mejor área de click */
 .modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 3;                   /* 🔝 evita solapar con badge u otros */
-  border: 1px solid var(--color-borde);
-  background: rgba(0,0,0,.15);
-  color: var(--color-texto);
-  border-radius: 10px;
-  cursor: pointer;
-  padding: 6px 8px;
-  line-height: 0;               /* no crecer por tipografía */
-  backdrop-filter: blur(2px);
+  position: absolute; top: 12px; right: 12px; z-index: 3;
+  border: 1px solid var(--color-borde); background: rgba(0,0,0,.15);
+  color: var(--color-texto); border-radius: 10px; cursor: pointer; padding: 6px 8px; line-height: 0; backdrop-filter: blur(2px);
 }
-
-/* Header: reservamos espacio a la derecha para la X */
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 10px;
-  padding-right: 56px;          /* 🛑 evita que la badge quede debajo de la X */
-}
+.modal-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 10px; padding-right: 56px; }
 .modal-header h3 { margin: 0; }
 .modal-header .badge { white-space: nowrap; }
-
-.modal-galeria {
-  display: grid; gap: 10px; grid-template-columns: 2fr 1fr;
-}
-.modal-galeria img {
-  width: 100%; height: 280px; object-fit: cover;
-  border-radius: 12px; border: 1px solid var(--color-borde);
-}
+.modal-galeria { display: grid; gap: 10px; grid-template-columns: 2fr 1fr; }
+.modal-galeria img { width: 100%; height: 280px; object-fit: cover; border-radius: 12px; border: 1px solid var(--color-borde); }
 .modal-datos { display: grid; gap: 8px; margin-top: 8px; }
 .modal-specs { display: flex; gap: 12px; flex-wrap: wrap; color: var(--color-texto-sec); }
 .modal-precio { font-size: 1.25rem; font-weight: 800; }
-
-/* Mobile: un poco menos de margen de seguridad */
-@media (max-width: 768px) {
-  .modal-header { padding-right: 48px; }
-}
-
+@media (max-width: 768px) { .modal-header { padding-right: 48px; } }
 
 /* ================================
    🧾 SOBRE NOSOTROS
-   - Puntos fuertes + proceso + CTAs
-   - Oscuro/claro via variables existentes
 ================================ */
-
-/* Encabezado */
-#sobre .seccion-head {
-  display: grid;
-  gap: .5rem;
-  margin-bottom: .25rem;
-}
-#sobre .seccion-head p {
-  color: var(--color-texto-sec);
-  max-width: 68ch;
-}
-
-/* ⭐️ Destacados (features) */
+#sobre .seccion-head { display: grid; gap: .5rem; margin-bottom: .25rem; }
+#sobre .seccion-head p { color: var(--color-texto-sec); max-width: 68ch; }
 #sobre .destacados {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 12px;
-  list-style: none;
-  padding: 0;
-  margin: 12px 0 18px;
+  display: grid; grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 12px; list-style: none; padding: 0; margin: 12px 0 18px;
 }
-#sobre .destacados li {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
+#sobre .destacados li{
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
   background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.06));
-  border: 1px solid var(--color-borde);
-  border-radius: 12px;
+  border: 1px solid var(--color-borde); border-radius: 12px;
 }
-#sobre .destacados i {
-  flex: 0 0 34px;
-  width: 34px; height: 34px;
-  display: grid; place-items: center;
-  border-radius: 999px;
-  color: var(--color-principal);
-  background: color-mix(in oklab, var(--color-principal) 15%, transparent);
-  /* Fallback si no hay color-mix */
-  background: rgba(34,197,94,.12);
-  border: 1px solid rgba(34,197,94,.35);
+#sobre .destacados i{
+  flex: 0 0 34px; width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: 999px; color: var(--color-principal);
+  background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.35);
 }
-
-/* 🧭 Proceso (3 pasos con numeración) */
 #sobre .proceso {
-  counter-reset: paso;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 12px;
-  list-style: none;
-  padding: 0;
-  margin: 0 0 12px;
+  counter-reset: paso; display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px; list-style: none; padding: 0; margin: 0 0 12px;
 }
-#sobre .proceso li {
-  position: relative;
-  min-height: 72px;
-  padding: 14px 14px 14px 48px;
-  border: 1px solid var(--color-borde);
-  border-radius: 12px;
+#sobre .proceso li{
+  position: relative; min-height: 72px; padding: 14px 14px 14px 48px;
+  border: 1px solid var(--color-borde); border-radius: 12px;
   background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.05));
+  word-break: normal; hyphens: auto;
 }
-#sobre .proceso li::before {
-  counter-increment: paso;
-  content: counter(paso);
-  position: absolute;
-  left: 12px; top: 12px;
-  width: 28px; height: 28px;
-  display: grid; place-items: center;
-  border-radius: 999px;
-  font-weight: 800;
-  color: #0a0f14;
-  background: var(--color-secundario);
+#sobre .proceso li::before{
+  counter-increment: paso; content: counter(paso);
+  position: absolute; left: 12px; top: 12px; width: 28px; height: 28px; display: grid; place-items: center;
+  border-radius: 999px; font-weight: 800; color: #0a0f14; background: var(--color-secundario);
   box-shadow: 0 4px 10px rgba(0,0,0,.25);
 }
+#sobre .cta-strip { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .25rem; }
+@media (max-width: 1024px){ #sobre .destacados { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 768px){ #sobre .destacados { grid-template-columns: 1fr; } }
 
-/* 🎯 CTAs */
-#sobre .cta-strip {
-  display: flex;
-  gap: .6rem;
-  flex-wrap: wrap;
-  margin-top: .25rem;
-}
-
-/* 📱 Responsive */
-@media (max-width: 1024px) {
-  #sobre .destacados { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  #sobre .proceso    { grid-template-columns: repeat(2, minmax(0,1fr)); }
-}
-@media (max-width: 768px) {
-  #sobre .destacados { grid-template-columns: 1fr; }
-  #sobre .proceso    { grid-template-columns: 1fr; }
-}
-
-/* 🌞 Ajustes en modo claro (clase .modo-oscuro en <body>) */
+/* Modo claro de Sobre */
 body.modo-oscuro #sobre .destacados li,
-body.modo-oscuro #sobre .proceso li {
-  background: #ffffff;
-}
-body.modo-oscuro #sobre .proceso li::before {
-  color: #fff; /* mejor contraste si el secundario es oscuro */
-}
-
-
-
+body.modo-oscuro #sobre .proceso li { background: #ffffff; }
+body.modo-oscuro #sobre .proceso li::before { color: #fff; }
 
 /* ================================
-   📞 Contacto – Layout + Form + Disponibilidad
-   - Qué: mejora visual y usabilidad del formulario y estado de atención
-   - Por qué: mayor conversión y claridad
-   - Dependencias: #contacto .bloque-disponibilidad, .form, .campo, .btn-primario
+   📞 Contacto
 ================================ */
+#contacto { display: grid; gap: 16px; }
 
-/* ---- Contenedor general ---- */
-#contacto {
-  display: grid;
-  gap: 16px;
+#contacto .bloque-disponibilidad{
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  padding: 0; border: none; background: none;
 }
+#contacto .bloque-disponibilidad .indicador{ display: none; }
 
-/* ---- Disponibilidad (pill con pulso cuando está abierto) ---- */
-#contacto .bloque-disponibilidad {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid var(--color-borde);
+#contacto #disponibilidadEstado,
+#contacto .horario{
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border: 1px solid var(--color-borde);
   border-radius: 12px;
   background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.06));
 }
+#contacto #disponibilidadEstado::before{
+  content:""; width: 12px; height: 12px; border-radius: 999px;
+  background: #bbb; box-shadow: 0 0 0 0 rgba(34,197,94,0);
+}
+@keyframes pulse-estado{
+  0%{ box-shadow: 0 0 0 0 rgba(34,197,94,.35); }
+  70%{ box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+  100%{ box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+#contacto #disponibilidadEstado.abierto::before{ background: #22c55e; animation: pulse-estado 1.8s ease-out infinite; }
+#contacto #disponibilidadEstado.cerrado::before{ background: #ef4444; }
+@media (max-width: 480px){ #contacto .bloque-disponibilidad{ grid-template-columns: 1fr; } }
 
-#contacto .bloque-disponibilidad .indicador {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: #bbb; /* default */
-  box-shadow: 0 0 0 0 rgba(34,197,94,0); /* se anima cuando está abierto */
-}
-
-/* Pulso suave cuando está abierto */
-@keyframes pulse-estado {
-  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.35); }
-  70%  { box-shadow: 0 0 0 10px rgba(34,197,94,0); }
-  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-}
-#contacto .bloque-disponibilidad .estado-abierto {
-  background: #22c55e !important;
-  animation: pulse-estado 1.8s ease-out infinite;
-}
-#contacto .bloque-disponibilidad .estado-cerrado {
-  background: #ef4444 !important;
-}
-
-#contacto .bloque-disponibilidad #disponibilidadEstado {
-  font-weight: 600;
-}
-#contacto .bloque-disponibilidad .horario {
-  margin-left: 6px;
-  color: var(--color-texto-sec);
-}
-
-/* ---- Formulario ---- */
-#contacto .form {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 14px;
-}
-
-/* Cada campo por defecto ocupa 6 columnas (2 en una fila) en desktop */
-#contacto .form .campo {
-  display: grid;
-  gap: 6px;
-  grid-column: span 6;
-}
-
-/* Etiquetas */
-#contacto .form .campo label {
-  font-size: .9rem;
-  color: var(--color-texto-sec);
-}
-
-/* Controles */
-#contacto .form .campo input,
-#contacto .form .campo textarea {
-  width: 100%;
-  background: #0f1218;
-  color: var(--color-texto);
-  border: 1px solid var(--color-borde);
-  border-radius: 12px;
-  padding: 12px 12px;
-  outline: none;
+#contacto .form{ display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+#contacto .form .campo{ display: grid; gap: 6px; grid-column: span 6; }
+#contacto .form .campo label{ font-size: .9rem; color: var(--color-texto-sec); }
+#contacto .form .campo input, #contacto .form .campo textarea{
+  width: 100%; background: #0f1218; color: var(--color-texto);
+  border: 1px solid var(--color-borde); border-radius: 12px; padding: 12px 12px; outline: none;
   transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
 }
-
-/* Placeholder sutil */
-#contacto .form .campo input::placeholder,
-#contacto .form .campo textarea::placeholder {
-  color: rgba(170, 178, 197, .8);
+#contacto .form .campo input::placeholder, #contacto .form .campo textarea::placeholder{ color: rgba(170,178,197,.8); }
+#contacto .form .campo input:focus, #contacto .form .campo textarea:focus{
+  border-color: var(--color-secundario); box-shadow: 0 0 0 3px rgba(96,165,250,.28);
 }
-
-/* Foco accesible (ring suave) */
-#contacto .form .campo input:focus,
-#contacto .form .campo textarea:focus {
-  border-color: var(--color-secundario);
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, .28);
+#contacto .form .campo input:invalid, #contacto .form .campo textarea:invalid{ border-color: #ef4444; }
+#contacto .form .campo input[type="tel"]{ font-variant-numeric: tabular-nums; letter-spacing: .3px; }
+#contacto .form .campo textarea{ resize: vertical; min-height: 120px; }
+#contacto .form .campo:has(textarea){ grid-column: 1 / -1; }
+@supports not (selector(:has(*))){ #contacto .form .campo:nth-child(3){ grid-column: 1 / -1; } }
+#contacto .form .btn-primario{ grid-column: 1 / -1; justify-self: end; padding: 12px 18px; }
+#contacto .form .btn-primario:disabled{ opacity: .65; cursor: not-allowed; }
+@media (max-width: 768px){
+  #contacto .form{ grid-template-columns: 1fr; }
+  #contacto .form .campo{ grid-column: 1 / -1; }
+  #contacto .form .btn-primario{ justify-self: stretch; }
 }
-
-/* Validación nativa simple */
-#contacto .form .campo input:invalid,
-#contacto .form .campo textarea:invalid {
-  border-color: #ef4444;
-}
-
-/* Tel más legible */
-#contacto .form .campo input[type="tel"] {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .3px;
-}
-
-/* Textarea: solo resize vertical */
-#contacto .form .campo textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-/* El campo que contenga textarea ocupa el ancho completo
-   (fallback con nth-child por si :has no está disponible) */
-#contacto .form .campo:has(textarea) {
-  grid-column: 1 / -1;
-}
-@supports not (selector(:has(*))) {
-  #contacto .form .campo:nth-child(3) { grid-column: 1 / -1; }
-}
-
-/* Botón de envío alineado a la derecha y ancho fluido en mobile */
-#contacto .form .btn-primario {
-  grid-column: 1 / -1;
-  justify-self: end;
-  padding: 12px 18px;
-}
-
-/* Estados del botón deshabilitado (por si lo manejás desde JS) */
-#contacto .form .btn-primario:disabled {
-  opacity: .65;
-  cursor: not-allowed;
-}
-
-/* ---- Responsive ---- */
-@media (max-width: 768px) {
-  #contacto .form { grid-template-columns: 1fr; }
-  #contacto .form .campo { grid-column: 1 / -1; }
-  #contacto .form .btn-primario { justify-self: stretch; }
-}
-
-
-
-
-
 
 /* ================================
    🦶 Footer
@@ -557,9 +381,7 @@ body.modo-oscuro #sobre .proceso li::before {
 /* ================================
    📱 Responsive
 ================================ */
-@media (max-width: 1024px) {
-  .galeria-autos .card-auto { grid-column: span 6; }
-}
+@media (max-width: 1024px) { .galeria-autos .card-auto { grid-column: span 6; } }
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .btn-hamburguesa { display: inline-flex; }
@@ -572,7 +394,7 @@ body.modo-oscuro #sobre .proceso li::before {
 /* ================================
    🌙 Modo claro (activo cuando <body> tiene .modo-oscuro)
 ================================ */
-body.modo-oscuro {
+body.modo-oscuro{
   --color-fondo: #f5f7fb;
   --color-panel: #ffffff;
   --color-borde: #e5e7eb;
@@ -584,139 +406,462 @@ body.modo-oscuro {
 
   background: linear-gradient(180deg, #f7fafc, #eef2f7 60%, #f5f7fb);
 }
-body.modo-oscuro .btn-secundario { background: #eef2f7; color: #0f172a; border-color: #e5e7eb; }
-body.modo-oscuro .sidebar { background: #ffffff; }
-body.modo-oscuro .sidebar-nav a { background: #ffffff; border-color: #e5e7eb; }
-body.modo-oscuro .nav-links a:hover { background: rgba(0,0,0,.05); }
-body.modo-oscuro .card-auto { background: #ffffff; border-color: #e5e7eb; }
-body.modo-oscuro .badge { background: rgba(34,197,94,.15); color: #15803d; border-color: rgba(34,197,94,.35); }
+body.modo-oscuro .header{ background: rgba(255,255,255,.75); border-color: #e5e7eb; }
+body.modo-oscuro .btn-secundario{ background: #eef2f7; color: #0f172a; border-color: #e5e7eb; }
+body.modo-oscuro .nav-links a:hover{ background: rgba(0,0,0,.05); }
+body.modo-oscuro .card-auto{ background: #ffffff; border-color: #e5e7eb; }
+body.modo-oscuro .badge{ background: rgba(34,197,94,.15); color: #15803d; border-color: rgba(34,197,94,.35); }
 
-/* ================================
-   📲 SPA mobile
-================================ */
-body.spa-mobile .seccion { display: none; }
-body.spa-mobile .seccion.activa { display: block; }
-
-
-/* ================================
-   📱 Fixes Mobile  (añadir al final)
-================================ */
-
-/* --- CONTACTO: Disponibilidad/Horario como pills --- */
-#contacto .bloque-disponibilidad {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 0;               /* el padding lo llevan las cajas */
+/* Inputs claros */
+body.modo-oscuro .filtro select,
+body.modo-oscuro .filtro input,
+body.modo-oscuro #contacto .form .campo input,
+body.modo-oscuro #contacto .form .campo textarea{
+  background: #ffffff; color: #0f172a; border-color: #e5e7eb;
+}
+body.modo-oscuro .filtro input::placeholder,
+body.modo-oscuro #contacto .form .campo input::placeholder,
+body.modo-oscuro #contacto .form .campo textarea::placeholder{ color: #64748b; }
+body.modo-oscuro #contacto .form .campo input:focus,
+body.modo-oscuro #contacto .form .campo textarea:focus{
+  border-color: var(--color-secundario); box-shadow: 0 0 0 3px rgba(37,99,235,.28);
 }
 
-/* oculto el punto suelto y lo genero como pseudo del texto */
-#contacto .bloque-disponibilidad .indicador { display: none; }
+/* SPA mobile */
+body.spa-mobile .seccion{ display: none; }
+body.spa-mobile .seccion.activa{ display: block; }
 
-#contacto #disponibilidadEstado,
-#contacto .horario {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid var(--color-borde);
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.06));
-}
-
-#contacto #disponibilidadEstado::before{
-  content:"";
-  width: 12px; height: 12px; border-radius: 999px;
-  background: #bbb;               /* default */
-  box-shadow: 0 0 0 0 rgba(34,197,94,0);
-}
-
-/* el JS setea .abierto / .cerrado en #disponibilidadEstado */
-#contacto #disponibilidadEstado.abierto::before{
-  background: #22c55e;
-  animation: pulse-estado 1.8s ease-out infinite;
-}
-#contacto #disponibilidadEstado.cerrado::before{ background: #ef4444; }
-
-@media (max-width: 480px){
-  #contacto .bloque-disponibilidad{ grid-template-columns: 1fr; }
-}
-
-/* --- SOBRE NOSOTROS: proceso 1-2-3 en mobile apilado --- */
-#sobre .proceso{ display:grid; gap:12px; grid-template-columns: repeat(3,1fr); }
-#sobre .proceso .paso{ min-width:0; }
-@media (max-width: 768px){
-  #sobre .proceso{ grid-template-columns: 1fr; }
-}
-
-/* --- Galería: estado vacío ocupa todo el ancho --- */
+/* Galería: estado vacío ocupa todo el ancho */
 .galeria-autos > p{
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 18px;
-  border: 1px dashed var(--color-borde);
-  border-radius: 12px;
-  color: var(--color-texto-sec);
+  grid-column: 1 / -1; text-align: center; padding: 18px;
+  border: 1px dashed var(--color-borde); border-radius: 12px; color: var(--color-texto-sec);
 }
 
-/* --- Hamburguesa: líneas más claras y centradas --- */
-.btn-hamburguesa{ width:44px; height:44px; }
-.btn-hamburguesa span{ width:22px; margin:4px 0; }
 
-/* --- MODAL: que entre en pantalla, header fijo, CTA sticky --- */
-.modal-content{
-  max-height: 92dvh;                /* respeta barra iOS */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;                 /* el scroll va en el body */
-  padding-bottom: 0;                /* el CTA tiene su padding */
+/* X visible aunque el botón esté vacío */
+#sidebarClose { position: relative; color: var(--color-texto); }
+#sidebarClose::before {
+  content: "✕";
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
 }
 
-/* el contenedor donde metés header+galería+datos */
-#modalBody{
+/* Sidebar más angosta */
+.sidebar .sidebar-sheet { width: min(300px, 84vw) !important; }
+
+/* Tarjetas compactas (forzamos por si hay estilos previos) */
+#sidebar .sidebar-nav a{
+  min-height: 40px !important;
+  padding: 8px 10px !important;
+  border-radius: 10px !important;
+  font-size: .95rem !important;
+}
+#sidebar .sidebar-nav a .ico svg{ width: 18px !important; height: 18px !important; }
+#sidebar .sidebar-nav a .chev svg{ width: 12px !important; height: 12px !important; }
+
+
+
+
+/* =======================================================
+   SIDEBAR — versión compacta (tipo “menú pro”)
+   Pegar AL FINAL del CSS
+======================================================= */
+
+/* Panel angosto y overlay */
+#sidebar {
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 60;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(2px);
+  transition: opacity .25s ease;
+}
+#sidebar.active { opacity: 1; pointer-events: auto; }
+
+#sidebar .sidebar-sheet{
+  position: absolute; inset: 0 0 0 auto;
+  width: clamp(260px, 80vw, 300px);      /* ⬅️ ancho como el mock */
+  max-width: 300px;
+  background: var(--color-panel);
+  border-left: 1px solid var(--color-borde);
+  transform: translateX(100%);
+  transition: transform .28s ease;
+  display: grid; grid-template-rows: auto 1fr;
+}
+#sidebar.active .sidebar-sheet{ transform: translateX(0); }
+
+/* Header del panel */
+#sidebar .sidebar-head{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-borde);
+}
+#sidebar .sidebar-title{
+  font-weight: 800; font-size: 1rem; margin: 0;
+}
+#sidebar .btn-icon{
+  width: 32px; height: 32px; border-radius: 8px;
+  display: grid; place-items: center;
+  border: 1px solid var(--color-borde);
+  background: var(--color-panel);
+  color: var(--color-texto);
+  cursor: pointer;
+}
+
+/* ================================
+   Lista compacta (resets + estilos)
+================================ */
+#sidebar .sidebar-nav{
+  margin: 0; padding: 8px 10px;
+  display: grid; gap: 6px;
+  list-style: none;
+}
+
+/* reset total para que nada los infle */
+#sidebar .sidebar-nav > li,
+#sidebar .sidebar-nav > *{
+  margin: 0 !important; padding: 0 !important; list-style: none !important;
+}
+#sidebar .sidebar-nav > li > a,
+#sidebar .sidebar-nav > a{
+  all: unset;                                  /* 🧨 borra estilos heredados */
+  display: grid !important;
+  grid-template-columns: 20px 1fr 0px !important; /* icono | texto | (sin chev) */
+  align-items: center !important;
+  gap: 12px !important;
+
+  padding: 12px 14px !important;               /* ⬅️ compacto */
+  min-height: 44px !important;                 /* 44–48px como el mock */
+  border-radius: 10px !important;
+  border: 1px solid var(--color-borde) !important;
+  background: #0f1218 !important;              /* fondo sobrio */
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.06)) !important;
+  color: var(--color-texto) !important;
+  cursor: pointer !important;
+}
+#sidebar .sidebar-nav > li > a:hover,
+#sidebar .sidebar-nav > a:hover{
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.08)) !important;
+  transform: none !important;
+}
+
+/* Iconitos chicos y color acento */
+#sidebar .sidebar-nav .ico{ display: grid !important; place-items: center !important; }
+#sidebar .sidebar-nav .ico svg{
+  width: 18px !important; height: 18px !important;
+  color: var(--color-principal);
+}
+#sidebar .sidebar-nav .txt{ font-size: 15.5px !important; line-height: 1.2 !important; }
+
+/* Modo claro para el panel */
+body.modo-oscuro #sidebar { background: rgba(15,17,21,.35); }
+body.modo-oscuro #sidebar .sidebar-sheet{ background:#fff; border-color:#e5e7eb; }
+body.modo-oscuro #sidebar .sidebar-head{ border-color:#e5e7eb; }
+body.modo-oscuro #sidebar .btn-icon{ background:#fff; border-color:#e5e7eb; }
+body.modo-oscuro #sidebar .sidebar-nav > li > a,
+body.modo-oscuro #sidebar .sidebar-nav > a{
+  background:#fff !important; border-color:#e5e7eb !important;
+}
+
+
+
+
+/* =======================================================
+   SIDEBAR — COMPACT NUCLEAR FIX (pegar al FINAL-del-FINAL)
+======================================================= */
+
+/* 1) Panel angosto */
+#sidebar, .sidebar { /* overlay */
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(2px);
+}
+#sidebar .sidebar-sheet,
+.sidebar .sidebar-sheet,
+#sidebar > nav,              /* fallback si no existe .sidebar-sheet */
+.sidebar > nav {
+  position: absolute; right: 0; top: 0; bottom: 0;
+  width: clamp(260px, 80vw, 300px) !important;
+  max-width: 300px !important;
+  background: var(--color-panel) !important;
+  border-left: 1px solid var(--color-borde) !important;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 18px;
-  padding-bottom: 12px;             /* deja lugar al CTA sticky */
+}
+body.modo-oscuro #sidebar .sidebar-sheet,
+body.modo-oscuro .sidebar .sidebar-sheet,
+body.modo-oscuro #sidebar > nav,
+body.modo-oscuro .sidebar > nav {
+  background: #fff !important; border-color:#e5e7eb !important;
 }
 
-/* título siempre visible al scrollear */
-/* Modal header — limpio, sin overlay */
-.modal-header{
-  position: relative;
-  background: transparent;
-  margin: 0 0 12px 0;      /* separa del contenido, no lo pisa */
-  padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* 2) NEUTRALIZAR estilos “grandes” heredados (.seccion, .card, etc.) */
+#sidebar .seccion, .sidebar .seccion,
+#sidebar [class*="seccion"], .sidebar [class*="seccion"],
+#sidebar .card, .sidebar .card,
+#sidebar article, .sidebar article,
+#sidebar section, .sidebar section {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
-.modal-header h3{
-  margin: 0;
-  font-size: 1.35rem;      /* ajustá si querés más chico en mobile */
-  line-height: 1.2;
+/* 3) Contenedor de ítems (cualquier markup) */
+#sidebar .sidebar-nav, .sidebar .sidebar-nav,
+#sidebar ul, .sidebar ul {
+  display: grid !important;
+  gap: 8px !important;
+  padding: 10px !important;
+  margin: 0 !important;
+  list-style: none !important;
 }
 
-.modal-header .badge{
-  margin-left: auto;       /* manda el chip a la derecha */
-  white-space: nowrap;
+/* 4) ÍTEMS COMPACTOS (a, button, li > a, .item, etc.) */
+#sidebar .sidebar-nav > a,
+#sidebar .sidebar-nav > button,
+#sidebar .sidebar-nav > li > a,
+#sidebar .sidebar-nav > .item,
+#sidebar .sidebar-nav > *[role="menuitem"],
+.sidebar .sidebar-nav > a,
+.sidebar .sidebar-nav > button,
+.sidebar .sidebar-nav > li > a,
+.sidebar .sidebar-nav > .item,
+.sidebar .sidebar-nav > *[role="menuitem"] {
+  display: grid !important;
+  grid-template-columns: 20px 1fr 0px !important; /* icono | texto | (sin chev) */
+  align-items: center !important;
+  gap: 12px !important;
+
+  min-height: 44px !important;
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+
+  font-size: 15px !important;
+  color: var(--color-texto) !important;
+  text-decoration: none !important;
+
+  border: 1px solid var(--color-borde) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.06)) !important;
+
+  margin: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+#sidebar .sidebar-nav > a:hover,
+#sidebar .sidebar-nav > button:hover,
+#sidebar .sidebar-nav > li > a:hover,
+#sidebar .sidebar-nav > .item:hover,
+.sidebar .sidebar-nav > a:hover,
+.sidebar .sidebar-nav > button:hover,
+.sidebar .sidebar-nav > li > a:hover,
+.sidebar .sidebar-nav > .item:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.08)) !important;
+}
+
+/* 5) Iconos y texto chicos */
+#sidebar .sidebar-nav .ico, .sidebar .sidebar-nav .ico {
+  display: grid !important; place-items: center !important;
+  width: 20px !important; height: 20px !important;
+}
+#sidebar .sidebar-nav .ico svg, .sidebar .sidebar-nav .ico svg {
+  width: 18px !important; height: 18px !important;
+}
+#sidebar .sidebar-nav .txt, .sidebar .sidebar-nav .txt {
+  font-size: 15px !important;
+}
+
+/* 6) Si hay chevrons, que no sumen ancho/alto */
+#sidebar .sidebar-nav .chev, .sidebar .sidebar-nav .chev {
+  width: 0 !important; height: 0 !important; overflow: hidden !important;
+}
+
+/* 7) Modo claro de los ítems */
+body.modo-oscuro #sidebar .sidebar-nav > *,
+body.modo-oscuro .sidebar .sidebar-nav > * {
+  background:#fff !important; border-color:#e5e7eb !important;
+  color:#0f172a !important;
 }
 
 
-/* imágenes adaptativas en mobile */
-.modal-galeria img{
-  height: clamp(200px, 36dvh, 340px);
+
+/* =======================================================
+   SIDEBAR — COMPACT FINAL (pegar al FINAL de styles.css)
+======================================================= */
+
+/* Panel angosto */
+#sidebar .sidebar-sheet{
+  width: clamp(260px, 80vw, 300px) !important;
+  max-width: 300px !important;
+  border-left: 1px solid var(--color-borde) !important;
+  background: var(--color-panel) !important;
+}
+body.modo-oscuro #sidebar .sidebar-sheet{
+  background:#fff !important; border-color:#e5e7eb !important;
 }
 
-/* CTA pegado abajo y siempre visible */
-.modal-cta{
-  position: sticky;
-  bottom: 0;
-  z-index: 3;
-  background:
-    linear-gradient(to top, var(--color-panel) 70%, color-mix(in srgb, var(--color-panel), transparent 70%));
-  padding: 12px 18px;
-  border-top: 1px solid var(--color-borde);
+/* Head compacto + X siempre visible */
+#sidebar .sidebar-head{ padding: 10px 14px !important; }
+#sidebar #sidebarClose{
+  width: 34px !important; height: 34px !important;
+  display: grid !important; place-items: center !important;
+  border: 1px solid var(--color-borde) !important;
+  background: var(--color-panel) !important;
+  border-radius: 10px !important;
 }
-.modal-cta .btn-primario{ width: 100%; }
+#sidebar #sidebarClose::before{
+  content:"✕"; font-size:18px; line-height:1; color: var(--color-texto);
+}
+
+/* **NUKE** de estilos “grandes” que puedan colarse */
+#sidebar .seccion, #sidebar [class*="seccion"],
+#sidebar .card, #sidebar article, #sidebar section{
+  margin:0 !important; padding:0 !important; border:0 !important;
+  background:transparent !important; box-shadow:none !important;
+}
+
+/* Contenedor de navegación */
+#sidebar .sidebar-nav{
+  display:grid !important; gap:8px !important;
+  padding:10px 12px !important; margin:0 !important; list-style:none !important;
+}
+
+/* Ítems compactos (funciona sean <a>, <button> o .item) */
+#sidebar .sidebar-nav > a,
+#sidebar .sidebar-nav > button,
+#sidebar .sidebar-nav > li > a,
+#sidebar .sidebar-nav > .item{
+  display:grid !important;
+  grid-template-columns: 22px 1fr 16px !important; /* icono | texto | chevron */
+  align-items:center !important; gap:10px !important;
+
+  height:44px !important; min-height:44px !important;
+  padding:0 12px !important; border-radius:10px !important;
+
+  font-size:15px !important; color:var(--color-texto) !important;
+  text-decoration:none !important;
+
+  border:1px solid var(--color-borde) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.06)) !important;
+
+  margin:0 !important; box-shadow:none !important; transform:none !important;
+  overflow:hidden !important;  /* evita que algo “estire” el alto */
+}
+
+/* Hover */
+#sidebar .sidebar-nav > a:hover,
+#sidebar .sidebar-nav > button:hover,
+#sidebar .sidebar-nav > li > a:hover,
+#sidebar .sidebar-nav > .item:hover{
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.08)) !important;
+}
+
+/* Iconos y chevron en tamaño chico */
+#sidebar .sidebar-nav .ico{ width:20px !important; height:20px !important; display:grid !important; place-items:center !important; }
+#sidebar .sidebar-nav .ico svg{ width:18px !important; height:18px !important; }
+#sidebar .sidebar-nav .chev svg{ width:12px !important; height:12px !important; opacity:.7; }
+
+/* Por si algún span viene con display:block y mete alturas raras */
+#sidebar .sidebar-nav a span{ display:inline !important; }
+
+/* Modo claro de los ítems */
+body.modo-oscuro #sidebar .sidebar-nav > a,
+body.modo-oscuro #sidebar .sidebar-nav > button,
+body.modo-oscuro #sidebar .sidebar-nav > li > a,
+body.modo-oscuro #sidebar .sidebar-nav > .item{
+  background:#fff !important; border-color:#e5e7eb !important; color:#0f172a !important;
+}
+
+
+/* =========================================================
+   SIDEBAR — HARD COMPACT (override total)
+   Pegar AL FINAL del CSS
+========================================================= */
+
+#sidebar .sidebar-sheet{
+  width: clamp(260px, 80vw, 300px) !important;
+  max-width: 300px !important;
+}
+
+/* Head compacto */
+#sidebar .sidebar-head{
+  padding: 10px 14px !important;
+  margin: 0 0 8px 0 !important;
+  border-bottom: 1px solid var(--color-borde) !important;
+}
+
+/* Lista SIN espacios fantasmas: flex + gap chico */
+#sidebar .sidebar-nav{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;                 /* ← separación entre items */
+  padding: 8px 10px !important;
+  margin: 0 !important;
+  list-style: none !important;
+}
+
+/* Ítems ULTRA compactos (44px exactos) */
+#sidebar .sidebar-nav > a{
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+
+  border-radius: 10px !important;
+  border: 1px solid var(--color-borde) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.06)) !important;
+
+  line-height: 1 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  transform: none !important;
+}
+
+/* Icono y chevron chicos */
+#sidebar .sidebar-nav > a .ico,
+#sidebar .sidebar-nav > a .chev{
+  display: grid !important;
+  place-items: center !important;
+  line-height: 0 !important;
+  color: var(--color-texto-sec) !important;
+}
+#sidebar .sidebar-nav > a .ico svg{ width: 16px !important; height: 16px !important; }
+#sidebar .sidebar-nav > a .chev{ margin-left: auto !important; opacity: .7 !important; }
+#sidebar .sidebar-nav > a .chev svg{ width: 12px !important; height: 12px !important; }
+
+/* Sin pseudoelementos raros ni márgenes internos */
+#sidebar .sidebar-nav > a::before,
+#sidebar .sidebar-nav > a::after{ content: none !important; display: none !important; }
+#sidebar .sidebar-nav > a *{ margin: 0 !important; }
+
+/* Modo claro consistente */
+body.modo-oscuro #sidebar .sidebar-sheet{ background:#fff !important; border-color:#e5e7eb !important; }
+body.modo-oscuro #sidebar .sidebar-nav > a{
+  background:#fff !important;
+  border-color:#e5e7eb !important;
+  color:#0f172a !important;
+}
+
+
+/* Hover un pelín más marcado */
+#sidebar .sidebar-nav > a:hover{
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.08)) !important;
+}
+
+/* Estado “activo” para la sección actual */
+#sidebar .sidebar-nav > a.is-active{
+  border-color: color-mix(in srgb, var(--color-secundario) 40%, var(--color-borde)) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-secundario) 15%, transparent) inset !important;
+}
+
+/* Más compacto aún (si lo quisieras): */
+#sidebar .sidebar-nav{ gap: 4px !important; }
+#sidebar .sidebar-nav > a{ height: 40px !important; min-height: 40px !important; }

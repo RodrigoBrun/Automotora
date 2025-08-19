@@ -12,58 +12,119 @@
   ========================================================== -->
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
   <link rel="preconnect" href="https://unpkg.com">
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"/>
+  <!-- FIX: ruta estable de Phosphor (antes /src/regular/style.css) -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/css/regular.css"/>
+
+  <!-- (Opcional SEO) -->
+  <!-- FIX: meta description y OG básicos para compartir -->
+  <meta name="description" content="Catálogo actualizado de vehículos: filtrá por marca, tipo, año y kilómetros. Atención personalizada y precios reales.">
+  <meta property="og:title" content="Automotora – Catálogo de Vehículos">
+  <meta property="og:description" content="Encontrá tu próximo vehículo. Filtros por marca, tipo, año y más.">
+  <meta property="og:type" content="website">
 
   <!-- CSS propio -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- =========================================================
-       🔝 Header fijo + Navbar (desktop)
-       Qué: navegación principal, toggle de tema, hamburguesa mobile
-       Por qué: acceso rápido a secciones y control de modo claro/oscuro
-       Dependencias: .nav-links, #btn-modo-oscuro, #hamburguesa (script.js)
-  ========================================================== -->
-  <header class="header">
-    <div class="container header-content">
-      <a href="#" class="logo" aria-label="Ir al inicio">
-        <span class="logo-marca">Automotora</span>
-        <span class="logo-tag">Crador Rodrigo Brun</span>
-      </a>
+     🔝 Header fijo + Navbar (desktop)
+     Cambios:
+     - “Creador Rodrigo Brun” (fix typo).
+     - aria-expanded="false" en hamburguesa (accesibilidad).
+========================================================== -->
+<header class="header">
+  <div class="container header-content">
+    <a href="#" class="logo" aria-label="Ir al inicio">
+      <span class="logo-marca">Automotora</span>
+      <span class="logo-tag">Creador Rodrigo Brun</span>
+    </a>
 
-      <nav class="nav" aria-label="Navegación principal">
-        <ul class="nav-links">
-          <li><a href="#inicio">Inicio</a></li>
-          <li><a href="#vehiculos">Vehículos</a></li>
-          <li><a href="#sobre">Sobre Nosotros</a></li>
-          <li><a href="#contacto">Contacto</a></li>
-        </ul>
+    <nav class="nav" aria-label="Navegación principal">
+      <ul class="nav-links">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#vehiculos">Vehículos</a></li>
+        <li><a href="#sobre">Sobre Nosotros</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
 
-        <button id="btn-modo-oscuro" class="btn-modo" aria-label="Cambiar tema">
-          <i class="ph ph-moon" aria-hidden="true"></i>
-        </button>
+      <!-- Botón modo (luna/sol) -->
+      <button id="btn-modo-oscuro" class="btn-modo" aria-label="Cambiar tema">
+        <i class="ph ph-moon" aria-hidden="true"></i>
+      </button>
 
-        <button id="hamburguesa" class="btn-hamburguesa" aria-label="Abrir menú">
-          <span></span><span></span><span></span>
-        </button>
-      </nav>
-    </div>
-  </header>
+      <!-- Botón hamburguesa (anima a X) -->
+      <button
+        id="hamburguesa"
+        class="btn-hamburguesa"
+        aria-label="Abrir menú"
+        aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
 
   <!-- =========================================================
-       📋 Sidebar (mobile)
-       Qué: menú lateral para móviles
-       Por qué: UX limpia en pantallas chicas (SPA mobile)
-       Dependencias: #sidebar.active (styles), wire en script.js
-  ========================================================== -->
-  <aside id="sidebar" class="sidebar" aria-hidden="true">
-    <nav class="sidebar-nav" aria-label="Navegación móvil">
-      <a href="#inicio"><i class="ph ph-house"></i> Inicio</a>
-      <a href="#vehiculos"><i class="ph ph-car"></i> Vehículos</a>
-      <a href="#sobre"><i class="ph ph-info"></i> Sobre Nosotros</a>
-      <a href="#contacto"><i class="ph ph-phone"></i> Contacto</a>
+     📋 Sidebar (mobile) — con overlay + header + iconos + chevron
+========================================================= -->
+<!-- Sidebar / Drawer -->
+<aside id="sidebar" class="sidebar" aria-hidden="true">
+  <div class="sidebar-sheet">
+    <div class="sidebar-head">
+      <div class="brand-mini">Automotora</div>
+      <button id="sidebarClose" class="btn-icon" aria-label="Cerrar menú"></button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#inicio">
+        <span class="ico">
+          <!-- home -->
+          <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M218.8 103.7 139.1 31.5a16 16 0 0 0-22.2 0l-79.7 72.2a8 8 0 0 0 10.7 11.9L56 106.2V208a16 16 0 0 0 16 16h44a8 8 0 0 0 8-8v-56h8v56a8 8 0 0 0 8 8h44a16 16 0 0 0 16-16v-101.8l8.1 7.4a8 8 0 1 0 10.7-11.9Z"/></svg>
+        </span>
+        <span>Inicio</span>
+        <span class="chev">
+          <svg viewBox="0 0 256 256" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="m96 48 80 80-80 80-16-16 64-64-64-64Z"/></svg>
+        </span>
+      </a>
+
+      <a href="#vehiculos">
+        <span class="ico">
+          <!-- car -->
+          <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M240 120h-11.2L205.4 66a16 16 0 0 0-14.1-8H64.7A16 16 0 0 0 50.6 66L27.2 120H16a8 8 0 0 0 0 16h8v56a16 16 0 0 0 16 16h16a16 16 0 0 0 16-16v-8h112v8a16 16 0 0 0 16 16h16a16 16 0 0 0 16-16v-56h8a8 8 0 0 0 0-16ZM69.3 72h117.4l20.6 40H48.7ZM72 176H40v-24h32Zm144 0h-32v-24h32Z"/></svg>
+        </span>
+        <span>Vehículos</span>
+        <span class="chev">
+          <svg viewBox="0 0 256 256" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="m96 48 80 80-80 80-16-16 64-64-64-64Z"/></svg>
+        </span>
+      </a>
+
+      <a href="#sobre">
+        <span class="ico">
+          <!-- info -->
+          <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M128 24a104 104 0 1 0 104 104A104.1 104.1 0 0 0 128 24Zm0 40a12 12 0 1 1-12 12a12 12 0 0 1 12-12Zm16 128h-24a8 8 0 0 1 0-16h8v-48h-8a8 8 0 0 1 0-16h16a8 8 0 0 1 8 8v56h8a8 8 0 0 1 0 16Z"/></svg>
+        </span>
+        <span>Sobre Nosotros</span>
+        <span class="chev">
+          <svg viewBox="0 0 256 256" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="m96 48 80 80-80 80-16-16 64-64-64-64Z"/></svg>
+        </span>
+      </a>
+
+      <a href="#contacto">
+        <span class="ico">
+          <!-- chat -->
+          <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M216 40H40a16 16 0 0 0-16 16v152l40-32h152a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Z"/></svg>
+        </span>
+        <span>Contacto</span>
+        <span class="chev">
+          <svg viewBox="0 0 256 256" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="m96 48 80 80-80 80-16-16 64-64-64-64Z"/></svg>
+        </span>
+      </a>
     </nav>
-  </aside>
+  </div>
+</aside>
+
+
 
   <!-- =========================================================
        🧱 MAIN – Secciones
@@ -91,18 +152,11 @@
          Dependencias: #galeriaAutos (render en script.js)
     ================================ -->
     <section id="vehiculos" class="seccion" data-aos="fade-up">
-      <!-- ================================
-           🔎 Filtros (UI)
-           - Search (marca/modelo)
-           - Marca, Tipo, Km máx, Año mín
-           - Ordenar por
-      ================================ -->
       <div class="filtros">
         <!-- 🔤 Búsqueda por texto -->
         <div class="filtro filtro-busqueda">
           <label for="filtroSearch">Buscar</label>
-          <input id="filtroSearch" type="text" placeholder="Marca o modelo…"
-                 aria-label="Buscar por marca o modelo">
+          <input id="filtroSearch" type="text" placeholder="Marca o modelo…" aria-label="Buscar por marca o modelo">
         </div>
 
         <!-- 🏷️ Marca -->
@@ -150,14 +204,15 @@
         <!-- ↕️ Orden -->
         <div class="filtro filtro-orden">
           <label for="ordenSelect">Ordenar por</label>
+          <!-- FIX: etiquetas más claras en las opciones -->
           <select id="ordenSelect" aria-label="Ordenar resultados">
             <option value="relevancia">Relevancia</option>
-            <option value="precio-asc">Precio ↑</option>
-            <option value="precio-desc">Precio ↓</option>
-            <option value="anio-desc">Año ↓</option>
-            <option value="anio-asc">Año ↑</option>
-            <option value="km-asc">Km ↑</option>
-            <option value="km-desc">Km ↓</option>
+            <option value="precio-asc">Precio (de menor a mayor)</option>
+            <option value="precio-desc">Precio (de mayor a menor)</option>
+            <option value="anio-desc">Año (más nuevo primero)</option>
+            <option value="anio-asc">Año (más antiguo primero)</option>
+            <option value="km-asc">Kilómetros (menos a más)</option>
+            <option value="km-desc">Kilómetros (más a menos)</option>
           </select>
         </div>
 
@@ -171,60 +226,63 @@
       <div id="galeriaAutos" class="galeria-autos" aria-live="polite"></div>
     </section>
 
-   <!-- ================================
-     🧾 SOBRE NOSOTROS
-     Qué: propuesta de valor, pruebas sociales y CTA
-     Por qué: transmitir confianza y guiar a la acción
-================================ -->
-<section id="sobre" class="seccion" data-aos="fade-up">
-  <header class="seccion-head" style="display:grid;gap:.5rem">
-    <h2>Sobre Nosotros</h2>
-    <p>
-      Somos una automotora enfocada en <strong>transparencia</strong> y <strong>servicio</strong>.
-      Publicamos precios reales, describimos el estado de cada unidad y brindamos atención
-      personalizada en nuestro local o por teléfono. Horario de atención: <b>09:00–12:00</b> y <b>14:00–19:00</b>.
-    </p>
-  </header>
+    <!-- ================================
+         🧾 SOBRE NOSOTROS
+         Qué: propuesta de valor, pruebas sociales y CTA
+         Por qué: transmitir confianza y guiar a la acción
+    ================================ -->
+    <section id="sobre" class="seccion" data-aos="fade-up">
+      <!-- FIX: sin estilos inline; usamos clases ya definidas en CSS -->
+      <header class="seccion-head">
+        <h2>Sobre Nosotros</h2>
+        <p>
+          Somos una automotora enfocada en <strong>transparencia</strong> y <strong>servicio</strong>.
+          Publicamos precios reales, describimos el estado de cada unidad y brindamos atención
+          personalizada en nuestro local o por teléfono. Horario de atención: <b>09:00–12:00</b> y <b>14:00–19:00</b>.
+        </p>
+      </header>
 
-  <!-- ⭐️ Puntos fuertes (bullets cortos) -->
-  <ul class="destacados" style="display:grid;gap:.6rem;margin:1rem 0 1.25rem;padding-left:0;list-style:none">
-    <li style="display:flex;align-items:center;gap:.6rem">
-      <i class="ph ph-seal-check" aria-hidden="true"></i>
-      <span>Vehículos inspeccionados y con historial claro</span>
-    </li>
-    <li style="display:flex;align-items:center;gap:.6rem">
-      <i class="ph ph-arrows-left-right" aria-hidden="true"></i>
-      <span>Tomamos tu usado en parte de pago</span>
-    </li>
-    <li style="display:flex;align-items:center;gap:.6rem">
-      <i class="ph ph-identification-card" aria-hidden="true"></i>
-      <span>Gestión de papeles y asesoramiento</span>
-    </li>
-  </ul>
+      <!-- ⭐️ Puntos fuertes -->
+      <!-- FIX: sin inline; ya existe #sobre .destacados en CSS -->
+      <ul class="destacados">
+        <li>
+          <i class="ph ph-seal-check" aria-hidden="true"></i>
+          <span>Vehículos inspeccionados y con historial claro</span>
+        </li>
+        <li>
+          <i class="ph ph-arrows-left-right" aria-hidden="true"></i>
+          <span>Tomamos tu usado en parte de pago</span>
+        </li>
+        <li>
+          <i class="ph ph-identification-card" aria-hidden="true"></i>
+          <span>Gestión de papeles y asesoramiento</span>
+        </li>
+      </ul>
 
-  <!-- 🧭 Mini flujo: cómo trabajamos -->
-  <ol class="proceso" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 1rem 0;padding-left:1.1rem">
-    <li>
-      <strong>Elegí</strong><br>
-      Navegá el catálogo, filtrá por marca, tipo y año.
-    </li>
-    <li>
-      <strong>Coordinamos</strong><br>
-      Agenda visita, prueba de manejo y revisión mecánica.
-    </li>
-    <li>
-      <strong>Te lo llevás</strong><br>
-      Armamos la documentación y te entregamos la unidad.
-    </li>
-  </ol>
+      <!-- 🧭 Proceso -->
+      <!-- FIX: sin inline (el CSS lo hace responsive con auto-fit) -->
+      <ol class="proceso">
+        <li>
+          <strong>Elegí</strong><br>
+          Navegá el catálogo, filtrá por marca, tipo y año.
+        </li>
+        <li>
+          <strong>Coordinamos</strong><br>
+          Agenda visita, prueba de manejo y revisión mecánica.
+        </li>
+        <li>
+          <strong>Te lo llevás</strong><br>
+          Armamos la documentación y te entregamos la unidad.
+        </li>
+      </ol>
 
-  <!-- 🎯 CTA doble -->
-  <div class="cta-strip" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem">
-    <a href="#vehiculos" class="btn-primario">Ver Vehículos</a>
-    <a href="#contacto" class="btn-secundario">Contactar</a>
-  </div>
-</section>
-
+      <!-- 🎯 CTA doble -->
+      <!-- FIX: sin inline; clase ya existe en CSS -->
+      <div class="cta-strip">
+        <a href="#vehiculos" class="btn-primario">Ver Vehículos</a>
+        <a href="#contacto" class="btn-secundario">Contactar</a>
+      </div>
+    </section>
 
     <!-- ================================
          📞 CONTACTO
@@ -293,6 +351,13 @@
        - script.js: lógica de Sistema + UI + SPA/tema/modal
   ========================================================== -->
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-  <script src="script.js"></script>
+  <script src="js/data.vehiculos.js"></script>
+<script src="js/dominio.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/ui.listados.js"></script>
+<script src="js/ui.modal.js"></script>
+<script src="js/ui.navtema.js"></script>
+<script src="js/app.js"></script>
+
 </body>
 </html>

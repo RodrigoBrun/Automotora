@@ -1,0 +1,582 @@
+/* =========================================================
+   SCRIPT.JS – Sistema + UI + Navegación/Sidebar/Modo Oscuro
+   Estilo Rodrigo — Senior
+========================================================= */
+
+/* ================================
+   🔧 Iconos fallback (SVG inline, sin fuentes)
+   - Si la fuente Phosphor no carga, usamos estos SVGs.
+================================ */
+const ICONS = {
+  /* Tema + cierre */
+  moon: '<svg width="18" height="18" viewBox="0 0 256 256" aria-hidden="true"><path d="M228.5 152.5a92 92 0 0 1-125-125a8 8 0 0 0-9.7-10.8A108 108 0 1 0 241.3 187.2a8 8 0 0 0-10.8-9.7Z" fill="currentColor"/></svg>',
+  sun:  '<svg width="18" height="18" viewBox="0 0 256 256" aria-hidden="true"><path d="M128 84a44 44 0 1 0 44 44a44 44 0 0 0-44-44Zm0-60a8 8 0 0 1 8 8v20a8 8 0 0 1-16 0V32a8 8 0 0 1 8-8Zm0 208a8 8 0 0 1 8 8v20a8 8 0 0 1-16 0v-20a8 8 0 0 1 8-8ZM24 128a8 8 0 0 1 8-8h20a8 8 0 0 1 0 16H32a8 8 0 0 1-8-8Zm180-8h20a8 8 0 0 1 0 16h-20a8 8 0 0 1 0-16ZM45.7 45.7a8 8 0 0 1 11.3 0l14.1 14.1a8 8 0 0 1-11.3 11.3L45.7 57a8 8 0 0 1 0-11.3Zm139.2 139.2a8 8 0 0 1 11.3 0l14.1 14.1a8 8 0 1 1-11.3 11.3l-14.1-14.1a8 8 0 0 1 0-11.3Zm25.4-128a8 8 0 0 1 0 11.3l-14.1 14.1a8 8 0 1 1-11.3-11.3l14.1-14.1a8 8 0 0 1 11.3 0ZM66.9 185.8a8 8 0 0 1 0 11.3L52.8 211.2a8 8 0 0 1-11.3-11.3l14.1-14.1a8 8 0 0 1 11.3 0Z" fill="currentColor"/></svg>',
+  x:    '<svg width="18" height="18" viewBox="0 0 256 256" aria-hidden="true"><path d="m205.7 194.3-60-60 60-60a8 8 0 0 0-11.4-11.3l-60 60-60-60A8 8 0 1 0 62.9 74l60 60-60 60a8 8 0 0 0 11.3 11.3l60-60 60 60a8 8 0 0 0 11.3-11.3Z" fill="currentColor"/></svg>',
+
+  /* Iconos de la sidebar */
+  home:  '<svg width="18" height="18" viewBox="0 0 256 256" aria-hidden="true"><path d="M128 44 36 116v96h64v-52h56v52h64v-96Z" fill="currentColor"/></svg>',
+  car:   '<svg width="18" height="18" viewBox="0 0 256 256" aria-hidden="true"><rect x="48" y="104" width="160" height="56" rx="12" fill="currentColor"/><circle cx="84" cy="172" r="10" fill="#fff"/><circle cx="172" cy="172" r="10" fill="#fff"/></svg>',
+  info:  '<svg width="18" height="18" viewBox="0 0 256 256" aria-hidden="true"><circle cx="128" cy="128" r="96" fill="currentColor"/><rect x="120" y="108" width="16" height="60" fill="#fff"/><circle cx="128" cy="88" r="8" fill="#fff"/></svg>',
+  phone: '<svg width="18" height="18" viewBox="0 0 256 256" aria-hidden="true"><path d="M176 24H80a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h96a16 16 0 0 0 16-16V40a16 16 0 0 0-16-16Zm-48 168a12 12 0 1 1 12-12a12 12 0 0 1-12 12Z" fill="currentColor"/></svg>',
+  chev:  '<svg width="16" height="16" viewBox="0 0 256 256" aria-hidden="true"><path d="M96 48l64 80-64 80" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+};
+
+/** Cambia icono del botón de tema por sun/moon SVG */
+function setThemeIcon(isLight){
+  const btn = document.getElementById('btn-modo-oscuro');
+  if (!btn) return;
+  btn.innerHTML = isLight ? ICONS.sun : ICONS.moon;
+  btn.setAttribute('aria-label', isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+}
+
+/** Inyecta iconos en la sidebar y la “X” del botón cerrar */
+function decorarSidebar(){
+  const links = document.querySelectorAll('#sidebar .sidebar-nav a');
+  links.forEach(a=>{
+    const name = a.getAttribute('data-ico');
+    if (!a.querySelector('.ico')){
+      const ico = document.createElement('span');
+      ico.className = 'ico';
+      ico.innerHTML = ICONS[name] || ICONS.info;
+      a.prepend(ico);
+    }
+    const chev = a.querySelector('.chev');
+    if (chev && !chev.innerHTML) chev.innerHTML = ICONS.chev;
+  });
+  const close = document.getElementById('sidebarClose');
+  if (close && !close.innerHTML) close.innerHTML = ICONS.x;
+}
+
+/* ================================
+   🧠 Dominio
+================================ */
+class Vehiculo {
+  constructor({ id, marca, modelo, anio, km, tipo, precio, imagen, descripcion="", fotos=[], estado="Disponible"}) {
+    this.id = id; this.marca = marca; this.modelo = modelo; this.anio = anio;
+    this.km = km; this.tipo = tipo; this.precio = precio; this.imagen = imagen;
+    this.descripcion = descripcion; this.fotos = fotos; this.estado = estado;
+  }
+}
+
+class Sistema {
+  constructor(){ /** @type {Vehiculo[]} */ this.vehiculos = []; }
+  precargarDatos(){
+    const base = [
+      { id:1, marca:"Toyota", modelo:"Corolla", anio:2020, km:45000, tipo:"Auto", precio:17990, imagen:"./imagenes/toyota-corolla.jpg",
+        descripcion:"Sedán confiable, bajo consumo, service al día.", fotos:["./imagenes/toyota-corolla-2.jpg"], estado:"Disponible" },
+      { id:2, marca:"Volkswagen", modelo:"Golf", anio:2018, km:70000, tipo:"Auto", precio:14990, imagen:"./imagenes/vw-golf.jpg",
+        descripcion:"Compacto ágil, impecable de interiores.", fotos:["./imagenes/vw-golf-2.jpg"], estado:"Disponible" },
+      { id:3, marca:"BMW", modelo:"X5", anio:2021, km:35000, tipo:"SUV", precio:58900, imagen:"./imagenes/bmw-x5.jpg",
+        descripcion:"Full equipo, motor potente, único dueño.", fotos:["./imagenes/bmw-x5-2.jpg"], estado:"Disponible" },
+      { id:4, marca:"Ford", modelo:"Ranger", anio:2019, km:82000, tipo:"Camioneta", precio:31900, imagen:"./imagenes/ford-ranger.jpg",
+        descripcion:"4x4 lista para trabajar, neumáticos nuevos.", fotos:["./imagenes/ford-ranger-2.jpg"], estado:"Disponible" },
+      { id:5, marca:"Chevrolet", modelo:"Onix", anio:2022, km:22000, tipo:"Auto", precio:16990, imagen:"./imagenes/chevrolet-onix.jpg",
+        descripcion:"Excelente relación precio-calidad, multimedia.", fotos:["./imagenes/chevrolet-onix-2.jpg"], estado:"Reservado" },
+      { id:6, marca:"Land Rover", modelo:"Range Rover", anio:2020, km:41000, tipo:"SUV", precio:89900, imagen:"./imagenes/range-rover.jpg",
+        descripcion:"Lujo y confort, mantenimientos oficiales.", fotos:["./imagenes/range-rover-2.jpg"], estado:"Disponible" },
+    ];
+    for (let i = 0; i < base.length; i++) this.vehiculos.push(new Vehiculo(base[i]));
+  }
+  obtenerVehiculosFiltrados(filtros){
+    const q = (filtros.q || "").trim().toLowerCase();
+    const resultado = [];
+    for (let i = 0; i < this.vehiculos.length; i++) {
+      const v = this.vehiculos[i];
+      if (filtros.marca && v.marca !== filtros.marca) continue;
+      if (filtros.tipo && v.tipo !== filtros.tipo) continue;
+      if (typeof filtros.kmMax === "number" && v.km > filtros.kmMax) continue;
+      if (typeof filtros.anioMin === "number" && v.anio < filtros.anioMin) continue;
+      if (q && !(`${v.marca} ${v.modelo}`.toLowerCase().includes(q))) continue;
+      resultado.push(v);
+    }
+    return resultado;
+  }
+  obtenerMarcas(){
+    const marcas = [];
+    for (let i = 0; i < this.vehiculos.length; i++){
+      const m = this.vehiculos[i].marca;
+      if (!marcas.includes(m)) marcas.push(m);
+    }
+    marcas.sort((a,b)=>a.localeCompare(b));
+    return marcas;
+  }
+}
+
+/* ================================
+   🧩 Utilidades de UI
+================================ */
+function crearImagenSegura(src, alt, opts = {}) {
+  const RUTA_PLACEHOLDER = "./imagenes/placeholder-auto.jpg";
+  const TRANSPARENTE_1x1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/abxP/QAAAAASUVORK5CYII=";
+  function normalizarRuta(r) {
+    if (!r) return RUTA_PLACEHOLDER;
+    const esAbsoluta = /^(https?:|data:|blob:|\/)/i.test(r);
+    if (esAbsoluta) return r;
+    if (r.startsWith("./")) return r;
+    return `./${r}`;
+  }
+  const img = document.createElement("img");
+  if (opts.className) img.className = opts.className;
+  img.alt = alt || "";
+  img.loading = "lazy";
+  img.decoding = "async";
+  if (opts.sizes) img.sizes = opts.sizes;
+  if (opts.srcset) img.srcset = opts.srcset;
+  let intento = 0;
+  function setSrc(res) {
+    const ruta = normalizarRuta(res);
+    try { img.src = new URL(ruta, document.baseURI).href; }
+    catch { img.src = ruta; }
+  }
+  setSrc(src);
+  img.onerror = () => {
+    intento++;
+    if (intento === 1) setSrc(RUTA_PLACEHOLDER);
+    else { img.onerror = null; img.src = TRANSPARENTE_1x1; }
+  };
+  return img;
+}
+
+/* ================================
+   🎛️ UI (interacción y render)
+================================ */
+let sistema = new Sistema();
+
+function debounce(fn, wait=250){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), wait); }; }
+
+function uiLeerFiltros(){
+  const marca = document.querySelector("#filtroMarca")?.value || "";
+  const tipo = document.querySelector("#filtroTipo")?.value || "";
+  const kmStr = document.querySelector("#filtroKm")?.value || "";
+  const anioStr = document.querySelector("#filtroAnio")?.value || "";
+  const q = document.querySelector("#filtroSearch")?.value || "";
+  const filtros = {};
+  if (marca) filtros.marca = marca;
+  if (tipo) filtros.tipo = tipo;
+  if (kmStr) filtros.kmMax = Number(kmStr);
+  if (anioStr) filtros.anioMin = Number(anioStr);
+  if (q) filtros.q = q;
+  return filtros;
+}
+
+function uiAplicarOrden(lista, criterio){
+  const arr = lista.slice();
+  switch (criterio){
+    case "precio-asc": arr.sort((a,b)=>a.precio-b.precio); break;
+    case "precio-desc": arr.sort((a,b)=>b.precio-a.precio); break;
+    case "anio-desc": arr.sort((a,b)=>b.anio-a.anio); break;
+    case "anio-asc": arr.sort((a,b)=>a.anio-b.anio); break;
+    case "km-asc": arr.sort((a,b)=>a.km-b.km); break;
+    case "km-desc": arr.sort((a,b)=>b.km-a.km); break;
+    default: break;
+  }
+  return arr;
+}
+
+function uiCargarFiltros(){
+  const selMarca = document.querySelector("#filtroMarca");
+  if (!selMarca) return;
+  selMarca.querySelectorAll("option:not(:first-child)").forEach(opt=>opt.remove());
+  sistema.obtenerMarcas().forEach(m=>{
+    const opt = document.createElement("option");
+    opt.value = m; opt.textContent = m; selMarca.appendChild(opt);
+  });
+}
+
+function uiRenderVehiculos(lista){
+  const cont = document.querySelector("#galeriaAutos");
+  if (!cont) return;
+  cont.innerHTML = "";
+  if (!lista.length){
+    const vacio = document.createElement("p");
+    vacio.textContent = "No se encontraron vehículos con los filtros aplicados.";
+    cont.appendChild(vacio);
+    return;
+  }
+  lista.forEach(v=>{
+    const card = document.createElement("article");
+    card.className = "card-auto";
+    card.setAttribute("data-aos","fade-up");
+
+    const img = crearImagenSegura(
+      v.imagen, `${v.marca} ${v.modelo}`,
+      { sizes: "(max-width:768px) 100vw, (max-width:1024px) 50vw, 33vw" }
+    );
+    card.appendChild(img);
+
+    const body = document.createElement("div");
+    body.className = "card-body";
+
+    const titulo = document.createElement("div");
+    titulo.className = "card-titulo";
+
+    const h3 = document.createElement("h3");
+    h3.textContent = `${v.marca} ${v.modelo}`;
+
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = v.tipo;
+
+    titulo.appendChild(h3);
+    titulo.appendChild(badge);
+
+    const meta = document.createElement("div");
+    meta.className = "card-meta";
+    meta.innerHTML = `<span>${v.anio}</span> · <span>${v.km.toLocaleString()} km</span> · <span>${v.estado}</span>`;
+
+    const precio = document.createElement("div");
+    precio.className = "card-precio";
+    precio.textContent = `USD ${v.precio.toLocaleString()}`;
+
+    const acciones = document.createElement("div");
+    acciones.className = "card-acciones";
+
+    const btnInfo = document.createElement("button");
+    btnInfo.className = "btn-info";
+    btnInfo.textContent = "Ver más info";
+    btnInfo.addEventListener("click", ()=>uiAbrirModalVehiculo(v));
+    acciones.appendChild(btnInfo);
+
+    body.appendChild(titulo);
+    body.appendChild(meta);
+    body.appendChild(precio);
+    body.appendChild(acciones);
+
+    card.appendChild(body);
+    cont.appendChild(card);
+  });
+
+  if (window.AOS && typeof AOS.refreshHard === 'function') AOS.refreshHard();
+}
+
+function uiWireFiltros(){
+  const selects = document.querySelectorAll("#filtroMarca, #filtroTipo, #filtroKm, #filtroAnio, #ordenSelect");
+  selects.forEach(sel=> sel.addEventListener("change", uiActualizarListado));
+  const inputSearch = document.querySelector("#filtroSearch");
+  if (inputSearch) inputSearch.addEventListener("input", debounce(uiActualizarListado, 200));
+  const btnLimpiar = document.querySelector("#btnLimpiarFiltros");
+  if (btnLimpiar){
+    btnLimpiar.addEventListener("click", ()=>{
+      document.querySelectorAll(".filtros select, .filtros input").forEach(el=>el.value="");
+      uiActualizarListado();
+    });
+  }
+}
+
+function uiActualizarListado(){
+  const filtros = uiLeerFiltros();
+  const orden = document.querySelector("#ordenSelect")?.value || "relevancia";
+  const lista = sistema.obtenerVehiculosFiltrados(filtros);
+  const ordenada = uiAplicarOrden(lista, orden);
+  uiRenderVehiculos(ordenada);
+}
+
+/* ================================
+   🪟 Modal
+================================ */
+function uiAbrirModalVehiculo(v){
+  const modal = document.getElementById("modal");
+  const body  = document.getElementById("modalBody");
+  if (!modal || !body) return;
+
+  body.innerHTML = "";
+
+  const header = document.createElement("div");
+  header.className = "modal-header";
+
+  const h3 = document.createElement("h3");
+  h3.textContent = `${v.marca} ${v.modelo}`;
+
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  badge.textContent = v.tipo;
+
+  header.appendChild(h3);
+  header.appendChild(badge);
+
+  const galeria = document.createElement("div");
+  galeria.className = "modal-galeria";
+
+  const contPrincipal = document.createElement("div");
+  contPrincipal.appendChild(crearImagenSegura(v.imagen, `${v.marca} ${v.modelo}`));
+
+  const contSec = document.createElement("div");
+  if (Array.isArray(v.fotos) && v.fotos.length) {
+    v.fotos.forEach(src=>{
+      contSec.appendChild(crearImagenSegura(src, `${v.marca} ${v.modelo} foto adicional`));
+    });
+  }
+
+  galeria.appendChild(contPrincipal);
+  galeria.appendChild(contSec);
+
+  const datos = document.createElement("div");
+  datos.className = "modal-datos";
+
+  const specs = document.createElement("div");
+  specs.className = "modal-specs";
+  specs.innerHTML = `
+    <span>Año: <strong>${v.anio}</strong></span>
+    <span>Kilómetros: <strong>${v.km.toLocaleString()} km</strong></span>
+    <span>Estado: <strong>${v.estado}</strong></span>
+  `;
+
+  const precio = document.createElement("div");
+  precio.className = "modal-precio";
+  precio.textContent = `USD ${v.precio.toLocaleString()}`;
+
+  const desc = document.createElement("p");
+  desc.textContent = v.descripcion || "Sin descripción adicional.";
+
+  const ctas = document.createElement("div");
+  ctas.className = "modal-cta";
+
+  const btnContactar = document.createElement("button");
+  btnContactar.type = "button";
+  btnContactar.className = "btn-primario";
+  btnContactar.textContent = "Contactar";
+  btnContactar.addEventListener("click", ()=> uiContactarVehiculo(v));
+  ctas.appendChild(btnContactar);
+
+  datos.appendChild(specs);
+  datos.appendChild(precio);
+  datos.appendChild(desc);
+  datos.appendChild(ctas);
+
+  body.appendChild(header);
+  body.appendChild(galeria);
+  body.appendChild(datos);
+
+  modal.classList.add("abierto");
+  modal.setAttribute("aria-hidden","false");
+
+  // Fallback para el botón cerrar (si la X de Phosphor no aparece)
+  const closeBtn = modal.querySelector('.modal-close');
+  if (closeBtn && !closeBtn.querySelector('svg')) closeBtn.innerHTML = ICONS.x;
+}
+
+function uiWireModal(){
+  const modal = document.getElementById("modal");
+  if (!modal) return;
+  modal.addEventListener("click", (e)=>{
+    const target = e.target;
+    if (target && (target.hasAttribute("data-close-modal") || target.closest("[data-close-modal]"))) {
+      uiCerrarModal();
+    }
+  });
+  document.addEventListener("keydown",(e)=>{
+    if (e.key === "Escape") uiCerrarModal();
+  });
+}
+
+function uiCerrarModal(){
+  const modal = document.getElementById("modal");
+  if (!modal) return;
+  modal.classList.remove("abierto");
+  modal.setAttribute("aria-hidden","true");
+}
+
+/* ---------------------------------------------------------
+   CTA “Contactar” del modal
+--------------------------------------------------------- */
+function uiContactarVehiculo(v){
+  const msg = `Hola, me interesa el ${v.marca} ${v.modelo} (${v.anio}, ${v.km.toLocaleString()} km). ¿Sigue disponible?`;
+  uiCerrarModal();
+  const esMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (document.body.classList.contains('spa-mobile') || esMobile) {
+    if (typeof mostrarSeccion === 'function') mostrarSeccion('contacto');
+  } else {
+    document.querySelector('#contacto')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  try { history.replaceState(null, '', '#contacto'); } catch {}
+  const txt = document.getElementById('mensaje');
+  if (txt) {
+    if (!txt.value.trim()) txt.value = msg;
+    else if (!txt.value.includes(v.marca) || !txt.value.includes(v.modelo)) txt.value += `\n${msg}`;
+    setTimeout(() => { txt.focus(); const fin = txt.value.length; txt.setSelectionRange(fin, fin); }, 120);
+  }
+}
+
+/* ================================
+   ⏱ Disponibilidad (09–12, 14–19)
+================================ */
+function uiActualizarDisponibilidad(){
+  const etiqueta = document.getElementById("disponibilidadEstado");
+  if (!etiqueta) return;
+  const ahora = new Date();
+  const total = ahora.getHours()*60 + ahora.getMinutes();
+  const enManana = (total >= 9*60) && (total < 12*60);
+  const enTarde  = (total >= 14*60) && (total < 19*60);
+  const abierto  = enManana || enTarde;
+  etiqueta.textContent = abierto
+    ? "Disponibilidad: Abierto ahora"
+    : "Disponibilidad: Cerrado (de 09–12 y 14–19)";
+  etiqueta.classList.toggle('abierto', abierto);
+  etiqueta.classList.toggle('cerrado', !abierto);
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.AOS && typeof AOS.init === 'function') AOS.init();
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  window.addEventListener('load', () => {
+    const esMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (esMobile && location.hash) { history.replaceState(null, '', location.pathname); }
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  });
+
+  // 🧭 Sidebar + hamburguesa + overlay + close
+const hamburguesa = document.getElementById('hamburguesa');
+const sidebar = document.getElementById('sidebar');
+const btnClose = document.getElementById('sidebarClose');
+
+function setSidebar(open){
+  if (!sidebar) return;
+  sidebar.classList.toggle('active', open);
+  hamburguesa?.classList.toggle('abierto', open);
+  document.body.classList.toggle('no-scroll', open);
+  document.body.classList.toggle('menu-abierto', open);
+  sidebar.setAttribute('aria-hidden', open ? 'false' : 'true');
+  hamburguesa?.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+if (hamburguesa && sidebar) {
+  hamburguesa.setAttribute('aria-expanded', 'false');
+
+  // abrir/cerrar con el botón hamburguesa
+  hamburguesa.addEventListener('click', () =>
+    setSidebar(!sidebar.classList.contains('active'))
+  );
+
+  // cerrar con la X
+  btnClose?.addEventListener('click', () => setSidebar(false));
+
+  // cerrar tocando el overlay (fuera del panel)
+  sidebar.addEventListener('click', (e) => {
+    if (e.target === sidebar) setSidebar(false);
+  });
+
+  // cerrar al tocar un enlace
+  sidebar.querySelectorAll('.sidebar-nav a').forEach(a => {
+    a.addEventListener('click', () => setSidebar(false));
+  });
+
+  // si paso a desktop, me aseguro de cerrar
+  window.addEventListener('resize', () => {
+    if (!window.matchMedia('(max-width: 768px)').matches) setSidebar(false);
+  });
+}
+
+  // 🌙 Tema claro/oscuro con icono SIEMPRE visible
+  const botonModoOscuro = document.getElementById('btn-modo-oscuro');
+  const modoGuardado = localStorage.getItem('modoOscuro') === 'true';
+  if (modoGuardado) document.body.classList.add('modo-oscuro');
+  setThemeIcon(document.body.classList.contains('modo-oscuro')); // icono inicial
+
+  if (botonModoOscuro){
+    botonModoOscuro.addEventListener('click', () => {
+      const activado = document.body.classList.toggle('modo-oscuro');
+      localStorage.setItem('modoOscuro', activado);
+      setThemeIcon(activado);
+    });
+  }
+
+  // 🔗 Navegación SPA
+  (function wireNavegacionSPA() {
+    const enlaces = document.querySelectorAll('a[href^="#"]:not([data-spa-ignore]):not([data-close-modal])');
+    enlaces.forEach((a) => {
+      a.addEventListener('click', (e) => {
+        const hash = a.getAttribute('href');
+        if (!hash || hash === '#') return;
+        const destino = document.querySelector(hash);
+        if (!destino) return;
+        const esMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (esMobile && destino.classList.contains('seccion')) {
+          e.preventDefault();
+          mostrarSeccion(hash.slice(1), e);
+        } else {
+          e.preventDefault();
+          destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  })();
+
+  // 🚀 Bootstrap datos/UI
+  sistema.precargarDatos();
+  uiCargarFiltros();
+  uiWireFiltros();
+  uiWireModal();
+  uiActualizarListado();
+
+  // 🗓️ Footer año
+  const spanAnio = document.querySelector("#anio");
+  if (spanAnio) spanAnio.textContent = new Date().getFullYear();
+
+  // ⏱ Disponibilidad
+  uiActualizarDisponibilidad();
+  setInterval(uiActualizarDisponibilidad, 60000);
+
+  // Etiquetas "Ordenar por" más claras
+  const ordenSel = document.getElementById('ordenSelect');
+  if (ordenSel){
+    const mapa = {
+      'relevancia': 'Relevancia',
+      'precio-asc': 'Precio: de menor a mayor',
+      'precio-desc': 'Precio: de mayor a menor',
+      'anio-desc': 'Año: más nuevo primero',
+      'anio-asc': 'Año: más viejo primero',
+      'km-asc': 'Kilómetros: de menor a mayor',
+      'km-desc': 'Kilómetros: de mayor a menor'
+    };
+    [...ordenSel.options].forEach(opt=>{ if (mapa[opt.value]) opt.textContent = mapa[opt.value]; });
+  }
+});
+
+/* ===============================
+   SPA mobile: mostrar sección
+=============================== */
+function mostrarSeccion(id, e){
+  if (e && typeof e.preventDefault === 'function') e.preventDefault();
+  const hash = id.startsWith('#') ? id : `#${id}`;
+  const destino = document.querySelector(hash); if (!destino) return;
+  const esMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (esMobile) {
+    document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('activa'));
+    destino.classList.add('activa');
+    const sidebar = document.getElementById('sidebar');
+    const hamburguesa = document.getElementById('hamburguesa');
+    if (sidebar) { sidebar.classList.remove('active'); sidebar.setAttribute('aria-hidden','true'); }
+    if (hamburguesa) { hamburguesa.classList.remove('abierto'); hamburguesa.setAttribute('aria-expanded','false'); }
+    document.body.classList.remove('no-scroll', 'menu-abierto');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/* ===============================
+   Estado inicial – #inicio en mobile
+=============================== */
+(function initSecciones(){
+  function aplicar(){
+    const esMobile = window.matchMedia('(max-width: 768px)').matches;
+    document.body.classList.toggle('spa-mobile', esMobile);
+    if (esMobile){
+      const actual = document.querySelector('.seccion.activa') || document.querySelector('#inicio');
+      document.querySelectorAll('.seccion').forEach(sec=>sec.classList.remove('activa'));
+      if (actual) actual.classList.add('activa');
+    } else {
+      document.querySelectorAll('.seccion').forEach(sec=>sec.classList.remove('activa'));
+    }
+  }
+  aplicar();
+  window.addEventListener('resize', aplicar);
+})();
+
+/* Debug opcional */
+// console.log("baseURI:", document.baseURI);
+// fetch("./imagenes/ford-ranger.jpg").then(r => console.log("status:", r.status, "url:", r.url));
