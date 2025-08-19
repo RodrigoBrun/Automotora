@@ -29,17 +29,31 @@ function uiAbrirModalVehiculo(v){
   header.appendChild(h3);
   header.appendChild(badge);
 
-  // Galería
+  // Galería (principal grande + secundarias grandes)
   const galeria = document.createElement("div");
   galeria.className = "modal-galeria";
 
   const contPrincipal = document.createElement("div");
-  contPrincipal.appendChild(crearImagenSegura(v.imagen, `${v.marca} ${v.modelo}`));
+  contPrincipal.className = "principal"; // ⬅️ NUEVO
+  contPrincipal.appendChild(
+    crearImagenSegura(
+      v.imagen,
+      `${v.marca} ${v.modelo}`,
+      { sizes: "(max-width:768px) 100vw, 900px" }
+    )
+  );
 
   const contSec = document.createElement("div");
+  contSec.className = "secundarias"; // ⬅️ NUEVO
   if (Array.isArray(v.fotos) && v.fotos.length) {
     v.fotos.forEach(src=>{
-      contSec.appendChild(crearImagenSegura(src, `${v.marca} ${v.modelo} foto adicional`));
+      contSec.appendChild(
+        crearImagenSegura(
+          src,
+          `${v.marca} ${v.modelo} foto adicional`,
+          { sizes: "(max-width:768px) 100vw, 900px" }
+        )
+      );
     });
   }
 
