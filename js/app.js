@@ -1,5 +1,11 @@
 // ================================
 // 🚀 APP (Bootstrap / Wiring robusto)
+// Estilo Rodrigo — Senior
+// Decisiones clave:
+// - No anulamos el hash en mobile; lo respetamos y navegamos a la sección.
+// - Usamos scrollMarginTop para evitar que el header tape el ancla.
+// - uiWireModal se llama de forma defensiva.
+// - Bloqueamos el scroll del fondo cuando el modal está abierto con MutationObserver.
 // ================================
 let sistema;
 
@@ -9,8 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   window.addEventListener('load', () => {
-    const esMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (esMobile && location.hash) { history.replaceState(null, '', location.pathname); }
+    // NOTE: ya NO limpiamos el hash en mobile. Respetamos #contacto, etc.
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   });
 
@@ -36,7 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
   wireTema();
   wireNavegacionSPA();
   initSecciones();
-  uiWireModal();
+
+  // Llamada defensiva (si el archivo del modal no cargó no frenamos el resto)
+  if (typeof uiWireModal === 'function') {
+    uiWireModal();
+  } else {
+    console.warn('uiWireModal no disponible (ver js/ui.modal.js / orden de scripts)');
+  }
 
   // 4) Listado: asegurar contenedor + primer render (sin filtros) y luego filtros
   const cont = document.querySelector('#galeriaAutos');
@@ -82,6 +93,56 @@ document.addEventListener('DOMContentLoaded', () => {
       if (mapa[opt.value]) opt.textContent = mapa[opt.value];
     }
   }
+
+  // ================================
+  // 🔗 Navegación con hash (#contacto, #vehiculos)
+  // - En desktop: scrollIntoView con offset (via scrollMarginTop)
+  // - En mobile SPA: activar sección y scrollear a top
+  // ================================
+  // Offset para que el header fijo no tape la sección
+  document.querySelectorAll('.seccion').forEach(sec => {
+    sec.style.scrollMarginTop = '72px'; // ajustá al alto real del header
+  });
+
+  function navegarPorHash() {
+    const hash = location.hash;
+    if (!hash) return;
+    const destino = document.querySelector(hash);
+    if (!destino) return;
+    const esMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    if (document.body.classList.contains('spa-mobile') || esMobile) {
+      if (typeof mostrarSeccion === 'function') {
+        mostrarSeccion(hash.slice(1));
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+    } else {
+      destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // Al cargar con hash presente
+  if (location.hash) {
+    // esperar un tick para que todo esté montado
+    setTimeout(navegarPorHash, 0);
+  }
+  // Si el hash cambia luego (links internos)
+  window.addEventListener('hashchange', navegarPorHash);
+
+  // ================================
+  // 🪟 Modal: bloquear scroll del fondo cuando está abierto
+  // - Observamos cambios de clase en #modal (añade/quita .abierto)
+  // - Evita que el body se mueva detrás del modal en mobile
+  // ================================
+  (function bloquearScrollFondoConModal(){
+    const modal = document.getElementById('modal');
+    if (!modal || typeof MutationObserver === 'undefined') return;
+    const obs = new MutationObserver(() => {
+      const abierto = modal.classList.contains('abierto');
+      document.body.classList.toggle('no-scroll', abierto);
+    });
+    obs.observe(modal, { attributes: true, attributeFilter: ['class'] });
+  })();
 
   // 🔎 Helpers de diagnóstico (podés usarlos en la consola)
   window.dumpEstado = function(){
